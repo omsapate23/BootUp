@@ -74,6 +74,7 @@ class LauncherProvider with ChangeNotifier {
         _states[stackId] = LauncherState.error;
         _errorMessages[stackId] =
             'Docker Desktop is turned off or not installed. Please launch Docker and try again.';
+        notifyListeners();
         return;
       }
 
@@ -84,6 +85,7 @@ class LauncherProvider with ChangeNotifier {
       await _containerService.startStack(corePath);
 
       _states[stackId] = LauncherState.running;
+      notifyListeners();
       // Latency delay to ensure container sockets bind cleanly to the host network
       await Future.delayed(const Duration(seconds: 2));
       // Trigger an async browser command to automatically open the workspace
@@ -93,6 +95,7 @@ class LauncherProvider with ChangeNotifier {
       }
     } catch (e) {
       _states[stackId] = LauncherState.error;
+      notifyListeners();
       final errorString = e.toString();
       if (errorString.contains('PORT_CONFLICT')) {
         _errorMessages[stackId] =
@@ -137,10 +140,12 @@ class LauncherProvider with ChangeNotifier {
 
       _states[stackId] = LauncherState.inactive;
       _errorMessages[stackId] = '';
+      notifyListeners();
     } catch (e) {
       _states[stackId] = LauncherState.error;
       _errorMessages[stackId] =
           'Failed to stop: ${e.toString().replaceAll('Exception: ', '')}';
+      notifyListeners();
     } finally {
       _isProcessing = false;
       notifyListeners();
