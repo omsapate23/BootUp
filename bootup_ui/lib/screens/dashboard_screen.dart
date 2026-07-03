@@ -408,40 +408,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildTerminalRow(String component, String status, Color color) {
-    return Row(
-      children: [
-        Container(
-          width: 6,
-          height: 6,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          '$component: ',
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 12,
-            fontFamily: 'monospace',
-          ),
-        ),
-        Expanded(
-          child: Text(
-            status,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.5),
-              fontSize: 12,
-              fontFamily: 'monospace',
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildActiveWorkspaceCanvas(BuildContext context, String stackId) {
     final launcher = Provider.of<LauncherProvider>(context);
@@ -654,23 +620,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       ),
                                     ),
                                     const SizedBox(height: 32),
-                                    Container(
-                                      width: 340,
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF121212),
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(color: Colors.white.withOpacity(0.05)),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          _buildTerminalRow('Node.js Server', 'Listening on port 3000', Colors.green),
-                                          const SizedBox(height: 8),
-                                          _buildTerminalRow('MongoDB Database', 'Connected successfully', Colors.green),
-                                          const SizedBox(height: 8),
-                                          _buildTerminalRow('Hot Reload', 'Enabled and active', Colors.orangeAccent),
-                                        ],
-                                      ),
+                                    StreamBuilder<String>(
+                                      stream: launcher.streamLogs(stackId),
+                                      builder: (context, snapshot) {
+                                        final logs = snapshot.data ?? 'Initializing container logs stream...\n';
+                                        return Container(
+                                          height: 220,
+                                          width: 600,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF0C0C0F),
+                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(
+                                              color: Colors.white.withOpacity(0.08),
+                                              width: 1.5,
+                                            ),
+                                          ),
+                                          padding: const EdgeInsets.all(16),
+                                          child: SingleChildScrollView(
+                                            reverse: true,
+                                            child: Text(
+                                              logs,
+                                              style: const TextStyle(
+                                                color: Color(0xFF33FF33),
+                                                fontFamily: 'monospace',
+                                                fontSize: 11,
+                                                height: 1.4,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ],
                                 ),

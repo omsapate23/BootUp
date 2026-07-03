@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:path/path.dart' as p;
@@ -202,5 +203,29 @@ $stderr
       }
       rethrow;
     }
+  }
+
+  Future<String> queryContainerStats() async {
+    try {
+      final process = await Process.run('docker', ['stats', '--no-stream', '--format', '{{.CPUPerc}}|{{.MemUsage}}']);
+      if (process.exitCode == 0) return process.stdout.toString().trim();
+    } catch (_) {}
+    return "0.0%|0MB";
+  }
+
+  Stream<String> streamContainerLogs(String corePath) {
+    final controller = StreamController<String>();
+    final buffer = StringBuffer();
+    Process.start('docker', ['compose', 'logs', '-f', '--tail=100'], workingDirectory: corePath).then((process) {
+      process.stdout.transform(utf8.decoder).listen((data) {
+        buffer.write(data);
+        controller.add(buffer.toString());
+      });
+      process.stderr.transform(utf8.decoder).listen((data) {
+        buffer.write(data);
+        controller.add(buffer.toString());
+      });
+    });
+    return controller.stream;
   }
 }

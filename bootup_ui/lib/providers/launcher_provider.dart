@@ -27,7 +27,7 @@ class LauncherProvider with ChangeNotifier {
 
   String _liveCpu = '0.0 %';
   String _liveMemory = '0 MB';
-  Timer? _metricsTimer;
+  final Map<String, Timer?> _metricsTimers = {};
 
   bool get isProcessing => _isProcessing;
   bool get isDockerAvailable => _isDockerAvailable;
@@ -126,8 +126,8 @@ class LauncherProvider with ChangeNotifier {
       return;
     }
 
-    _metricsTimer?.cancel();
-    _metricsTimer = null;
+    _metricsTimers[stackId]?.cancel();
+    _metricsTimers.remove(stackId);
     _liveCpu = '0.0 %';
     _liveMemory = '0 MB';
 
@@ -197,10 +197,11 @@ class LauncherProvider with ChangeNotifier {
   }
 
   void _startMetricsStreaming(String stackId) {
-    _metricsTimer?.cancel();
-    _metricsTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+    _metricsTimers[stackId]?.cancel();
+    _metricsTimers[stackId] = Timer.periodic(const Duration(seconds: 3), (timer) async {
       if (!isRunning(stackId)) {
         timer.cancel();
+        _metricsTimers.remove(stackId);
         return;
       }
       try {
@@ -218,9 +219,17 @@ class LauncherProvider with ChangeNotifier {
     });
   }
 
+  Stream<String> streamLogs(String stackId) {
+    final corePath = _resolveCorePath();
+    return _containerService.streamContainerLogs(corePath);
+  }
+
   @override
   void dispose() {
-    _metricsTimer?.cancel();
+    for (final timer in _metricsTimers.values) {
+      timer?.cancel();
+    }
+    _metricsTimers.clear();
     super.dispose();
   }
 }
