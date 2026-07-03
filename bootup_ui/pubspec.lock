@@ -17,6 +17,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
+  bootup_bridge:
+    dependency: "direct main"
+    description:
+      path: "../bootup_bridge"
+      relative: true
+    source: path
+    version: "1.0.0"
   characters:
     dependency: transitive
     description:

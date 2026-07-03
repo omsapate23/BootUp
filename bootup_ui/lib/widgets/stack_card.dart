@@ -18,9 +18,9 @@ class TechPatternPainter extends CustomPainter {
       );
     }
 
-    // Sharp green subtle accent diagonal lines
+    // Sharp azure blue subtle accent diagonal lines
     final greenPaint = Paint()
-      ..color = const Color(0xFF00C853).withOpacity(0.03)
+      ..color = const Color(0xFF007BFF).withOpacity(0.03)
       ..strokeWidth = 1.5;
 
     for (double i = -size.height; i < size.width; i += 96) {
@@ -119,22 +119,12 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
         );
         break;
       case LauncherState.running:
-        statusColor = const Color(0xFF00C853); // Sharp green
+        statusColor = const Color(0xFF007BFF); // Sharp azure blue
         statusText = 'Active';
-        statusIndicator = Container(
-          width: 12,
-          height: 12,
-          decoration: const BoxDecoration(
-            color: Color(0xFF00C853),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Color(0xFF00C853),
-                blurRadius: 8,
-                spreadRadius: 1,
-              ),
-            ],
-          ),
+        statusIndicator = const Icon(
+          Icons.check,
+          color: Color(0xFF007BFF),
+          size: 14,
         );
         break;
       case LauncherState.error:
@@ -210,7 +200,7 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                           boxShadow: launcher.isRunning(widget.stackId)
                               ? [
                                   BoxShadow(
-                                    color: const Color(0xFF00C853).withOpacity(0.2),
+                                    color: const Color(0xFF007BFF).withOpacity(0.2),
                                     blurRadius: 8,
                                     spreadRadius: 1,
                                   ),
@@ -254,10 +244,10 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                       return Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF004D40), // Deep green background
+                          color: const Color(0xFF004080), // Deep azure blue background
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: const Color(0xFF00C853).withOpacity(0.15),
+                            color: const Color(0xFF007BFF).withOpacity(0.15),
                             width: 1,
                           ),
                         ),
@@ -313,7 +303,7 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                         boxShadow: (launcher.isRunning(widget.stackId) || launcher.isBooting(widget.stackId))
                             ? [
                                 BoxShadow(
-                                  color: const Color(0xFF00C853).withOpacity(0.18),
+                                  color: const Color(0xFF007BFF).withOpacity(0.18),
                                   blurRadius: 10,
                                   spreadRadius: 1,
                                 ),
@@ -329,7 +319,7 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                             side: BorderSide(
-                              color: const Color(0xFF00C853).withOpacity(0.4), // Subtle green glowing accent outline
+                              color: const Color(0xFF007BFF).withOpacity(0.4), // Subtle azure blue glowing accent outline
                               width: 1.5,
                             ),
                           ),
