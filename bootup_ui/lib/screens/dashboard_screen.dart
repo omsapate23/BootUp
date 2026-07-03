@@ -13,6 +13,15 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedNavigationIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    // Probe Docker availability immediately on launch so the footer is accurate
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<LauncherProvider>().checkSystemDependencies();
+    });
+  }
+
   final List<Map<String, dynamic>> _navigationItems = [
     {
       'label': 'Explore Stacks',
@@ -171,16 +180,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           Container(
                             width: 8,
                             height: 8,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF007BFF),
+                            decoration: BoxDecoration(
+                              color: launcher.isDockerAvailable
+                                  ? const Color(0xFF007BFF)
+                                  : Colors.grey,
                               shape: BoxShape.circle,
                             ),
                           ),
                           const SizedBox(width: 8),
-                          const Text(
-                            'Docker Ready',
+                          Text(
+                            launcher.isDockerAvailable
+                                ? 'Docker Daemon Active'
+                                : 'Docker Dependency Missing',
                             style: TextStyle(
-                              color: Colors.white70,
+                              color: launcher.isDockerAvailable
+                                  ? Colors.white70
+                                  : Colors.white38,
                               fontSize: 11,
                               fontWeight: FontWeight.w500,
                             ),

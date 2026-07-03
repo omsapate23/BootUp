@@ -122,6 +122,18 @@ class LauncherProvider with ChangeNotifier {
     }
   }
 
+  /// Probes Docker availability via the system bridge and updates the
+  /// reactive [isDockerAvailable] flag so the UI footer reflects real state.
+  Future<void> checkSystemDependencies() async {
+    try {
+      await _containerService.checkDockerStatus();
+      _isDockerAvailable = true;
+    } catch (_) {
+      _isDockerAvailable = false;
+    }
+    notifyListeners();
+  }
+
   void triggerError(String stackId, String message) {
     if (_isProcessing) return;
     _states[stackId] = LauncherState.error;
