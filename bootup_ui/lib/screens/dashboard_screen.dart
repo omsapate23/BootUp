@@ -299,26 +299,274 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             },
                           )
                         : _selectedNavigationIndex == 1
-                            ? Center(
-                                child: launcher.isRunning('web_kit')
-                                    ? SizedBox(
-                                        width: 400,
-                                        height: 300,
-                                        child: StackCard(
-                                          id: 'web_kit',
-                                          title: 'Full-Stack Web Dev Kit',
-                                          description: 'A complete Node.js app environment paired with a MongoDB database, running fully containerized inside isolated workspace borders.',
-                                          techBadges: ['NodeJS 20', 'Express', 'MongoDB 6.0', 'Mongoose'],
+                            ? (launcher.isRunning('web_kit')
+                                ? Row(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [
+                                      // Left side: Container Monitoring Stats Sidebar
+                                      Container(
+                                        width: 260,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF212121),
+                                          borderRadius: BorderRadius.circular(16),
+                                          border: Border.all(
+                                            color: Colors.white.withOpacity(0.08),
+                                            width: 1.5,
+                                          ),
                                         ),
-                                      )
-                                    : Text(
-                                        'No environments are currently running.',
-                                        style: TextStyle(
-                                          color: Colors.white.withOpacity(0.4),
-                                          fontSize: 16,
+                                        padding: const EdgeInsets.all(20),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                const Icon(Icons.analytics_outlined, color: Color(0xFF007BFF), size: 20),
+                                                const SizedBox(width: 10),
+                                                const Text(
+                                                  'Container Status',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 24),
+                                            _buildStatRow('CPU Usage', '2.4%', Icons.memory, Colors.greenAccent),
+                                            const SizedBox(height: 16),
+                                            _buildStatRow('Memory Usage', '128 MB / 2.0 GB', Icons.storage, Colors.blueAccent),
+                                            const SizedBox(height: 16),
+                                            _buildStatRow('Network IO', '12 KB / 8 KB', Icons.swap_calls, Colors.purpleAccent),
+                                            const SizedBox(height: 16),
+                                            _buildStatRow('Disk Read/Write', '0 B / 4 KB', Icons.save_alt, Colors.orangeAccent),
+                                            const Spacer(),
+                                            SizedBox(
+                                              width: double.infinity,
+                                              child: OutlinedButton.icon(
+                                                style: OutlinedButton.styleFrom(
+                                                  foregroundColor: Colors.redAccent,
+                                                  side: const BorderSide(color: Colors.redAccent, width: 1.5),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(12),
+                                                  ),
+                                                ),
+                                                onPressed: () {
+                                                  launcher.shutDown('web_kit');
+                                                },
+                                                icon: const Icon(Icons.power_settings_new, size: 16),
+                                                label: const Text('STOP CONTAINER'),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                              )
+                                      const SizedBox(width: 24),
+                                      // Right side: Embedded Code Sandbox Browser Shell
+                                      Expanded(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF262626),
+                                            borderRadius: BorderRadius.circular(16),
+                                            border: Border.all(
+                                              color: Colors.white.withOpacity(0.08),
+                                              width: 1.5,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(0.3),
+                                                blurRadius: 20,
+                                                offset: const Offset(0, 10),
+                                              ),
+                                            ],
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(14.5),
+                                            child: Column(
+                                              children: [
+                                                // Browser-like Header Address Bar
+                                                Container(
+                                                  height: 48,
+                                                  color: const Color(0xFF1F1F1F),
+                                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                                  child: Row(
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          _buildDot(Colors.redAccent.withOpacity(0.8)),
+                                                          const SizedBox(width: 6),
+                                                          _buildDot(Colors.amberAccent.withOpacity(0.8)),
+                                                          const SizedBox(width: 6),
+                                                          _buildDot(Colors.greenAccent.withOpacity(0.8)),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(width: 20),
+                                                      Icon(Icons.arrow_back, color: Colors.white.withOpacity(0.3), size: 18),
+                                                      const SizedBox(width: 12),
+                                                      Icon(Icons.arrow_forward, color: Colors.white.withOpacity(0.3), size: 18),
+                                                      const SizedBox(width: 16),
+                                                      Expanded(
+                                                        child: Container(
+                                                          height: 32,
+                                                          decoration: BoxDecoration(
+                                                            color: const Color(0xFF121212),
+                                                            borderRadius: BorderRadius.circular(8),
+                                                            border: Border.all(
+                                                              color: Colors.white.withOpacity(0.08),
+                                                            ),
+                                                          ),
+                                                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                                                          alignment: Alignment.centerLeft,
+                                                          child: Row(
+                                                            children: [
+                                                              const Icon(Icons.lock, color: Colors.greenAccent, size: 12),
+                                                              const SizedBox(width: 8),
+                                                              Text(
+                                                                'http://localhost:${launcher.getStackPort('web_kit')}',
+                                                                style: TextStyle(
+                                                                  color: Colors.white.withOpacity(0.8),
+                                                                  fontSize: 13,
+                                                                  fontFamily: 'monospace',
+                                                                ),
+                                                              ),
+                                                              const Spacer(),
+                                                              Material(
+                                                                color: Colors.transparent,
+                                                                child: InkWell(
+                                                                  onTap: () {},
+                                                                  borderRadius: BorderRadius.circular(4),
+                                                                  child: Padding(
+                                                                    padding: const EdgeInsets.all(4.0),
+                                                                    child: Icon(
+                                                                      Icons.refresh,
+                                                                      color: Colors.white.withOpacity(0.6),
+                                                                      size: 14,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 16),
+                                                      IconButton(
+                                                        icon: const Icon(Icons.open_in_new, size: 18),
+                                                        color: const Color(0xFF007BFF),
+                                                        onPressed: () {
+                                                          launcher.launchSystemBrowser('http://localhost:${launcher.getStackPort('web_kit')}');
+                                                        },
+                                                        tooltip: 'Open in System Browser',
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Container(
+                                                    color: const Color(0xFF1E1E1E),
+                                                    width: double.infinity,
+                                                    child: Stack(
+                                                      children: [
+                                                        Center(
+                                                          child: Column(
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            children: [
+                                                              Container(
+                                                                padding: const EdgeInsets.all(16),
+                                                                decoration: BoxDecoration(
+                                                                  color: const Color(0xFF007BFF).withOpacity(0.1),
+                                                                  shape: BoxShape.circle,
+                                                                  border: Border.all(
+                                                                    color: const Color(0xFF007BFF).withOpacity(0.3),
+                                                                    width: 2,
+                                                                  ),
+                                                                ),
+                                                                child: const Icon(
+                                                                  Icons.code_rounded,
+                                                                  color: Color(0xFF007BFF),
+                                                                  size: 40,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(height: 20),
+                                                              const Text(
+                                                                'Full-Stack Developer Kit Running',
+                                                                style: TextStyle(
+                                                                  color: Colors.white,
+                                                                  fontSize: 18,
+                                                                  fontWeight: FontWeight.bold,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(height: 8),
+                                                              Text(
+                                                                'Your web application workspace is ready.',
+                                                                style: TextStyle(
+                                                                  color: Colors.white.withOpacity(0.6),
+                                                                  fontSize: 14,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(height: 24),
+                                                              Container(
+                                                                width: 320,
+                                                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                                                decoration: BoxDecoration(
+                                                                  color: const Color(0xFF121212),
+                                                                  borderRadius: BorderRadius.circular(10),
+                                                                  border: Border.all(color: Colors.white.withOpacity(0.05)),
+                                                                ),
+                                                                child: Column(
+                                                                  children: [
+                                                                    _buildTerminalRow('Node.js Server', 'Listening on port 3000', Colors.green),
+                                                                    const SizedBox(height: 6),
+                                                                    _buildTerminalRow('MongoDB Database', 'Connected successfully', Colors.green),
+                                                                    const SizedBox(height: 6),
+                                                                    _buildTerminalRow('Hot Reload', 'Enabled and active', Colors.orangeAccent),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Positioned(
+                                                          top: 16,
+                                                          right: 16,
+                                                          child: Container(
+                                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                                            decoration: BoxDecoration(
+                                                              color: const Color(0xFF007BFF).withOpacity(0.2),
+                                                              borderRadius: BorderRadius.circular(8),
+                                                              border: Border.all(color: const Color(0xFF007BFF).withOpacity(0.3)),
+                                                            ),
+                                                            child: const Text(
+                                                              'LIVE WORKSPACE',
+                                                              style: TextStyle(
+                                                                color: Color(0xFF007BFF),
+                                                                fontSize: 10,
+                                                                fontWeight: FontWeight.bold,
+                                                                letterSpacing: 0.5,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Center(
+                                    child: Text(
+                                      'No environments are currently running.',
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.4),
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ))
                             : Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -347,6 +595,91 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildStatRow(String label, String value, IconData icon, Color color) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color, size: 16),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDot(Color color) {
+    return Container(
+      width: 10,
+      height: 10,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+      ),
+    );
+  }
+
+  Widget _buildTerminalRow(String component, String status, Color color) {
+    return Row(
+      children: [
+        Container(
+          width: 6,
+          height: 6,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          '$component: ',
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 12,
+            fontFamily: 'monospace',
+          ),
+        ),
+        Expanded(
+          child: Text(
+            status,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 12,
+              fontFamily: 'monospace',
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

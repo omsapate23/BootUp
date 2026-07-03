@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:bootup_bridge/bootup_bridge.dart';
 import 'package:path/path.dart' as p;
+import 'package:url_launcher/url_launcher.dart';
 
 enum LauncherState { inactive, booting, running, error }
 
@@ -12,6 +13,13 @@ class LauncherProvider with ChangeNotifier {
   final Map<String, LauncherState> _states = {};
   final Map<String, String> _errorMessages = {};
   bool _isDockerAvailable = false;
+
+  final Map<String, String> _stackPorts = {
+    'web_kit': '3000',
+    'python_sandbox': '8888',
+  };
+
+  String getStackPort(String id) => _stackPorts[id] ?? '3000';
 
   // Transaction protection lock state to prevent button flooding / race conditions
   bool _isProcessing = false;
@@ -77,7 +85,10 @@ class LauncherProvider with ChangeNotifier {
 
       _states[stackId] = LauncherState.running;
       // Trigger an async browser command to automatically open the workspace
-      launchUrl('http://localhost:3000');
+      final Uri url = Uri.parse('http://localhost:${getStackPort(stackId)}');
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      }
     } catch (e) {
       _states[stackId] = LauncherState.error;
       final errorString = e.toString();
@@ -147,14 +158,13 @@ class LauncherProvider with ChangeNotifier {
   }
 
   /// Launches a URL using the host platform's default web browser.
-  Future<void> launchUrl(String url) async {
+  Future<void> launchSystemBrowser(String urlString) async {
     try {
-      if (Platform.isWindows) {
-        await Process.run('cmd', ['/c', 'start', '', url]);
-      } else if (Platform.isMacOS) {
-        await Process.run('open', [url]);
-      } else if (Platform.isLinux) {
-        await Process.run('xdg-open', [url]);
+      final Uri url = Uri.parse(urlString);
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      } else {
+        debugPrint('Could not launch system browser for $urlString');
       }
     } catch (e) {
       debugPrint('Failed to launch URL: $e');

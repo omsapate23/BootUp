@@ -151,3 +151,35 @@ ProcessException: The system cannot find the file specified (at ../../../flutter
 
 [2026-07-03T19:05:35.642648] Stack teardown completed successfully for: D:\BootUp\bootup_core
 
+[2026-07-03T19:19:13.139829] Running Docker daemon health check...
+
+[2026-07-03T19:19:13.484815] Docker daemon health check passed.
+
+[2026-07-03T19:19:29.930461] Running Docker daemon health check...
+
+[2026-07-03T19:19:30.319551] Docker daemon health check passed.
+
+[2026-07-03T19:19:30.323765] Starting Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T19:19:31.458954] Stack startup completed successfully for: D:\BootUp\bootup_core
+
+[2026-07-03T19:19:53.459366] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T19:19:55.354362] Stack teardown completed successfully for: D:\BootUp\bootup_core
+
+[2026-07-03T19:21:15.776233] Running Docker daemon health check...
+
+[2026-07-03T19:21:16.187526] Docker daemon health check passed.
+
+[2026-07-03T19:21:21.233698] Running Docker daemon health check...
+
+[2026-07-03T19:21:21.561991] Docker daemon health check passed.
+
+[2026-07-03T19:21:21.564897] Starting Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T19:21:22.901736] Stack startup completed successfully for: D:\BootUp\bootup_core
+
+[2026-07-03T19:21:34.363564] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T19:21:36.423483] Stack teardown completed successfully for: D:\BootUp\bootup_core
+

@@ -307,7 +307,7 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                           ),
                         ),
                         onPressed: () {
-                          launcher.launchUrl('http://localhost:3000');
+                          launcher.launchSystemBrowser('http://localhost:${launcher.getStackPort(widget.id)}');
                         },
                         icon: const Icon(Icons.open_in_new, size: 18),
                         label: const Text(
