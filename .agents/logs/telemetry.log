@@ -1,0 +1,94 @@
+[2026-07-03T15:30:45.782002] Running Docker daemon health check...
+
+[2026-07-03T15:30:45.802078] Docker check failed: executable not found or errored.
+Details:
+ProcessException: The system cannot find the file specified (at ../../../flutter/third_party/dart/runtime/bin/process_win.cc:577)
+  Command: docker info
+
+[2026-07-03T15:30:52.391235] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T15:30:56.623924] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T15:30:57.705994] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T15:30:57.867254] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T15:31:07.529719] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T15:42:01.608245] Running Docker daemon health check...
+
+[2026-07-03T15:42:01.627230] Docker check failed: executable not found or errored.
+Details:
+ProcessException: The system cannot find the file specified (at ../../../flutter/third_party/dart/runtime/bin/process_win.cc:577)
+  Command: docker info
+
+[2026-07-03T15:42:08.525319] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:09.758368] Running Docker daemon health check...
+
+[2026-07-03T17:01:09.785964] Docker check failed: executable not found or errored.
+Details:
+ProcessException: The system cannot find the file specified (at ../../../flutter/third_party/dart/runtime/bin/process_win.cc:577)
+  Command: docker info
+
+[2026-07-03T17:01:15.543259] Running Docker daemon health check...
+
+[2026-07-03T17:01:15.548630] Docker check failed: executable not found or errored.
+Details:
+ProcessException: The system cannot find the file specified (at ../../../flutter/third_party/dart/runtime/bin/process_win.cc:577)
+  Command: docker info
+
+[2026-07-03T17:01:18.376014] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:30.893034] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:31.610756] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:31.781052] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:31.963680] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:32.138797] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:32.366594] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:32.557690] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:32.739025] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:32.919949] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:35.689423] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:35.876988] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:36.053712] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:36.226991] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:36.364220] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:36.750138] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:36.931943] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:37.111401] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:37.305172] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:37.464485] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:38.040397] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:38.559057] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:38.809948] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:39.005529] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:39.199293] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:39.521393] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T17:01:39.710317] Stopping Docker stack composition: D:\BootUp\bootup_core
+
