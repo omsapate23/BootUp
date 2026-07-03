@@ -1,0 +1,84 @@
+# ==============================================================================
+# BOOTUP CORE - DOCKER COMPOSE DEVELOPMENT TEMPLATE
+# ==============================================================================
+# This template defines a standard boilerplate environment for a "Node.js + MongoDB"
+# Web Dev Kit. All services run isolated inside containers to eliminate local host
+# dependency and configuration conflicts.
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # NodeJS Workspace Service: Serves as the isolated runtime environment
+  # ----------------------------------------------------------------------------
+  workspace:
+    image: node:20-alpine
+    container_name: bootup_node_workspace
+    
+    # Run the workspace in the /app directory inside the container
+    working_dir: /app
+    
+    # Mount the local project_code directory to the /app directory in the container.
+    # We also define an anonymous volume for node_modules to prevent local host 
+    # operating system architectures from conflicting with alpine linux packages.
+    volumes:
+      - ./project_code:/app
+      - /app/node_modules
+      
+    # Expose the local port 3000 mapping it directly to the containerized application port
+    ports:
+      - "3000:3000"
+      
+    # Setup environment variables for database connection and server state
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      # Connect to the MongoDB database service using the container service name (database)
+      - MONGO_URI=mongodb://database:27017/bootup_dev
+      
+    # Run npm install to resolve dependencies inside the alpine container environment,
+    # then start the developer server.
+    command: sh -c "npm install && npm start"
+    
+    # Ensures the database container is started before this workspace service is launched
+    depends_on:
+      - database
+      
+    # Connect workspace to the internal virtual network
+    networks:
+      - bootup_network
+
+  # ----------------------------------------------------------------------------
+  # MongoDB Database Service: Houses project data in an isolated instance
+  # ----------------------------------------------------------------------------
+  database:
+    image: mongo:6.0
+    container_name: bootup_mongodb
+    
+    # Expose MongoDB standard port locally for database visualizers (e.g. Compass)
+    ports:
+      - "27017:27017"
+      
+    # Persist MongoDB data outside the container lifecycle using a named volume
+    volumes:
+      - mongo_data:/data/db
+      
+    # Connect database to the internal virtual network
+    networks:
+      - bootup_network
+
+# ------------------------------------------------------------------------------
+# VOLUMES: Persistent storage scopes
+# ------------------------------------------------------------------------------
+volumes:
+  # Dedicated named volume to keep MongoDB records persistent across compose cycles
+  mongo_data:
+    driver: local
+
+# ------------------------------------------------------------------------------
+# NETWORKS: Bridge network for isolated communication
+# ------------------------------------------------------------------------------
+networks:
+  bootup_network:
+    driver: bridge
