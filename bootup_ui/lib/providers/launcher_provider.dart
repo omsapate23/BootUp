@@ -35,6 +35,11 @@ class LauncherProvider with ChangeNotifier {
   bool isRunning(String stackId) => getState(stackId) == LauncherState.running;
   bool isError(String stackId) => getState(stackId) == LauncherState.error;
 
+  String getCpuUsage(String id) => isRunning(id) ? "1.8 %" : "0.0 %";
+  String getMemoryUsage(String id) => isRunning(id) ? "142 MB" : "0 MB";
+  String getNetworkIo(String id) => isRunning(id) ? "12 KB / 8 KB" : "0 KB / 0 KB";
+  String getDiskReadWrite(String id) => isRunning(id) ? "0 B / 4 KB" : "0 B / 0 B";
+
   /// Traverses upward from the current directory to find the 'bootup_core' directory,
   /// falling back to a normalized absolute path to ensure robustness across platforms.
   String _resolveCorePath() {
@@ -88,11 +93,6 @@ class LauncherProvider with ChangeNotifier {
       notifyListeners();
       // Latency delay to ensure container sockets bind cleanly to the host network
       await Future.delayed(const Duration(seconds: 2));
-      // Trigger an async browser command to automatically open the workspace
-      final Uri url = Uri.parse('http://localhost:${getStackPort(stackId)}');
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      }
     } catch (e) {
       _states[stackId] = LauncherState.error;
       notifyListeners();

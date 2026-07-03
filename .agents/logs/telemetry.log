@@ -239,3 +239,27 @@ ProcessException: The system cannot find the file specified (at ../../../flutter
 
 [2026-07-03T20:01:15.825264] Stack startup completed successfully for: D:\BootUp\bootup_core
 
+[2026-07-03T23:43:33.616712] Running Docker daemon health check...
+
+[2026-07-03T23:43:33.973175] Docker daemon health check passed.
+
+[2026-07-03T23:43:36.768866] Running Docker daemon health check...
+
+[2026-07-03T23:43:37.057920] Docker daemon health check passed.
+
+[2026-07-03T23:43:37.060376] Starting Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T23:43:37.507572] Stack startup completed successfully for: D:\BootUp\bootup_core
+
+[2026-07-03T23:44:19.684546] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T23:44:22.048424] Stack teardown completed successfully for: D:\BootUp\bootup_core
+
+[2026-07-03T23:44:23.578117] Running Docker daemon health check...
+
+[2026-07-03T23:44:23.896059] Docker daemon health check passed.
+
+[2026-07-03T23:44:23.899066] Starting Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-03T23:44:25.317121] Stack startup completed successfully for: D:\BootUp\bootup_core
+

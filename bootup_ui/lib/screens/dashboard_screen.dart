@@ -12,14 +12,32 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedNavigationIndex = 0;
+  late LauncherProvider _launcherProvider;
 
   @override
   void initState() {
     super.initState();
+    _launcherProvider = Provider.of<LauncherProvider>(context, listen: false);
+    _launcherProvider.addListener(_onLauncherStateChanged);
+    
     // Probe Docker availability immediately on launch so the footer is accurate
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<LauncherProvider>(context, listen: false).checkSystemDependencies();
+      _launcherProvider.checkSystemDependencies();
     });
+  }
+
+  @override
+  void dispose() {
+    _launcherProvider.removeListener(_onLauncherStateChanged);
+    super.dispose();
+  }
+
+  void _onLauncherStateChanged() {
+    if (_launcherProvider.isRunning('web_kit') && _selectedNavigationIndex == 0) {
+      setState(() {
+        _selectedNavigationIndex = 1;
+      });
+    }
   }
 
   final List<Map<String, dynamic>> _navigationItems = [
@@ -388,17 +406,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildDot(Color color) {
-    return Container(
-      width: 10,
-      height: 10,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
-    );
-  }
-
   Widget _buildTerminalRow(String component, String status, Color color) {
     return Row(
       children: [
@@ -435,7 +442,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildActiveWorkspaceCanvas(BuildContext context, String stackId) {
-    final launcher = Provider.of<LauncherProvider>(context, listen: false);
+    final launcher = Provider.of<LauncherProvider>(context);
     final port = launcher.getStackPort(stackId);
     
     return Container(
@@ -446,7 +453,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Container(
             height: 64,
             decoration: BoxDecoration(
-              color: const Color(0xFF262626),
+              color: const Color(0xFF1A1A1F),
               border: Border(
                 bottom: BorderSide(
                   color: Colors.white.withOpacity(0.05),
@@ -457,17 +464,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Row(
               children: [
-                // Mock window controls
-                Row(
-                  children: [
-                    _buildDot(Colors.redAccent.withOpacity(0.8)),
-                    const SizedBox(width: 6),
-                    _buildDot(Colors.amberAccent.withOpacity(0.8)),
-                    const SizedBox(width: 6),
-                    _buildDot(Colors.greenAccent.withOpacity(0.8)),
-                  ],
-                ),
-                const SizedBox(width: 24),
                 Icon(Icons.arrow_back, color: Colors.white.withOpacity(0.3), size: 20),
                 const SizedBox(width: 16),
                 Icon(Icons.arrow_forward, color: Colors.white.withOpacity(0.3), size: 20),
@@ -568,13 +564,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ],
                         ),
                         const SizedBox(height: 24),
-                        _buildStatRow('CPU Usage', '2.4%', Icons.memory, Colors.greenAccent),
+                        _buildStatRow('CPU Usage', launcher.getCpuUsage(stackId), Icons.memory, Colors.greenAccent),
                         const SizedBox(height: 16),
-                        _buildStatRow('Memory Usage', '128 MB / 2.0 GB', Icons.storage, Colors.blueAccent),
+                        _buildStatRow('Memory Usage', launcher.getMemoryUsage(stackId), Icons.storage, Colors.blueAccent),
                         const SizedBox(height: 16),
-                        _buildStatRow('Network IO', '12 KB / 8 KB', Icons.swap_calls, Colors.purpleAccent),
+                        _buildStatRow('Network IO', launcher.getNetworkIo(stackId), Icons.swap_calls, Colors.purpleAccent),
                         const SizedBox(height: 16),
-                        _buildStatRow('Disk Read/Write', '0 B / 4 KB', Icons.save_alt, Colors.orangeAccent),
+                        _buildStatRow('Disk Read/Write', launcher.getDiskReadWrite(stackId), Icons.save_alt, Colors.orangeAccent),
                         const Spacer(),
                         const Row(
                           children: [
