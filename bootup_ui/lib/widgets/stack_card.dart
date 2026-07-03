@@ -56,6 +56,45 @@ class StackCard extends StatefulWidget {
 
 class _StackCardState extends State<StackCard> with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
+  final List<Map<String, dynamic>> _visibleLogs = [];
+  bool _isLogAnimationRunning = false;
+
+  void _startLogAnimation() {
+    if (_isLogAnimationRunning) return;
+    _isLogAnimationRunning = true;
+    _visibleLogs.clear();
+
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+      setState(() {
+        _visibleLogs.add({
+          'text': '[BOOTUP] Attaching to container system runtime...',
+          'color': const Color(0xFF007BFF),
+        });
+      });
+    });
+
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      if (!mounted) return;
+      setState(() {
+        final port = context.read<LauncherProvider>().getStackPort(widget.id);
+        _visibleLogs.add({
+          'text': '[NODE] Express server initialized on container port $port.',
+          'color': const Color(0xFF28A745),
+        });
+      });
+    });
+
+    Future.delayed(const Duration(milliseconds: 1800), () {
+      if (!mounted) return;
+      setState(() {
+        _visibleLogs.add({
+          'text': '[MONGO] Connection to isolated database context established.',
+          'color': const Color(0xFFFFC107),
+        });
+      });
+    });
+  }
 
   @override
   void initState() {
@@ -75,6 +114,15 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     final launcher = context.watch<LauncherProvider>();
+    final isRunning = launcher.isRunning(widget.id);
+    if (isRunning) {
+      if (!_isLogAnimationRunning) {
+        _startLogAnimation();
+      }
+    } else {
+      _isLogAnimationRunning = false;
+      _visibleLogs.clear();
+    }
 
     // Determine status values based on state
     Color statusColor;
@@ -263,6 +311,32 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                     }).toList(),
                   ),
                   const Spacer(),
+                  if (launcher.isRunning(widget.id)) ...[
+                    Container(
+                      height: 100,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF151515),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.05),
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: _visibleLogs.length,
+                        itemBuilder: (context, index) {
+                          final log = _visibleLogs[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 6.0),
+                            child: _buildLogLine(log['text'], log['color']),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                   // Error Alert Overlay if state is Error
                   if (launcher.isError(widget.id))
                     Padding(
@@ -410,6 +484,34 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildLogLine(String text, Color color) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '> ',
+          style: TextStyle(
+            color: color,
+            fontFamily: 'monospace',
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontFamily: 'monospace',
+              fontSize: 11,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

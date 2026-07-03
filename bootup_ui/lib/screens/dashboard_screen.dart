@@ -18,7 +18,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     // Probe Docker availability immediately on launch so the footer is accurate
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<LauncherProvider>().checkSystemDependencies();
+      Provider.of<LauncherProvider>(context, listen: false).checkSystemDependencies();
     });
   }
 
@@ -270,11 +270,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             builder: (context, constraints) {
                               // Dynamically adjust columns based on desktop viewport width
                               final columns = constraints.maxWidth > 800 ? 2 : 1;
+                              final hasRunning = launcher.isRunning('web_kit');
+                              final aspectRatio = hasRunning ? 0.95 : 1.35;
                               return GridView.count(
                                 crossAxisCount: columns,
                                 crossAxisSpacing: 24,
                                 mainAxisSpacing: 24,
-                                childAspectRatio: 1.35,
+                                childAspectRatio: aspectRatio,
                                 children: const [
                                   StackCard(
                                     id: 'web_kit',

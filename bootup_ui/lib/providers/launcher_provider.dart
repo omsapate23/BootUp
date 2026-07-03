@@ -84,6 +84,8 @@ class LauncherProvider with ChangeNotifier {
       await _containerService.startStack(corePath);
 
       _states[stackId] = LauncherState.running;
+      // Latency delay to ensure container sockets bind cleanly to the host network
+      await Future.delayed(const Duration(seconds: 2));
       // Trigger an async browser command to automatically open the workspace
       final Uri url = Uri.parse('http://localhost:${getStackPort(stackId)}');
       if (await canLaunchUrl(url)) {
