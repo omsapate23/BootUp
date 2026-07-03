@@ -102,6 +102,16 @@ class LauncherProvider with ChangeNotifier {
       return;
     }
 
+    // DEADLOCK GUARD: If Docker is unavailable and the card is in error state,
+    // calling stopStack would throw and re-trap the card in an error loop.
+    // Bypass the shell entirely and reset the card directly to inactive.
+    if (getState(stackId) == LauncherState.error && !_isDockerAvailable) {
+      _states[stackId] = LauncherState.inactive;
+      _errorMessages[stackId] = '';
+      notifyListeners();
+      return;
+    }
+
     _isProcessing = true;
     _states[stackId] = LauncherState.booting;
     notifyListeners();

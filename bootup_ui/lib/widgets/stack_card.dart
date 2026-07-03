@@ -319,24 +319,34 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                             side: BorderSide(
-                              color: const Color(0xFF007BFF).withOpacity(0.4), // Subtle azure blue glowing accent outline
+                              // Dim to red tint when dependency is missing, azure blue otherwise
+                              color: (!launcher.isDockerAvailable && launcher.isInactive(widget.id))
+                                  ? Colors.redAccent.withOpacity(0.3)
+                                  : const Color(0xFF007BFF).withOpacity(0.4),
                               width: 1.5,
                             ),
                           ),
                         ),
-                        onPressed: launcher.isBooting(widget.id)
+                        // Disable button entirely if Docker is missing and card is idle
+                        onPressed: (!launcher.isDockerAvailable && launcher.isInactive(widget.id))
                             ? null
-                            : () {
-                                if (launcher.isRunning(widget.id) || launcher.isError(widget.id)) {
-                                  launcher.shutDown(widget.id);
-                                } else {
-                                  launcher.bootUp(widget.id);
-                                }
-                              },
+                            : launcher.isBooting(widget.id)
+                                ? null
+                                : () {
+                                    if (launcher.isRunning(widget.id) || launcher.isError(widget.id)) {
+                                      launcher.shutDown(widget.id);
+                                    } else {
+                                      launcher.bootUp(widget.id);
+                                    }
+                                  },
                         icon: launcher.isBooting(widget.id)
                             ? const SizedBox.shrink()
                             : Icon(
-                                launcher.isRunning(widget.id) || launcher.isError(widget.id) ? Icons.stop : Icons.play_arrow,
+                                launcher.isRunning(widget.id) || launcher.isError(widget.id)
+                                    ? Icons.stop
+                                    : (!launcher.isDockerAvailable && launcher.isInactive(widget.id))
+                                        ? Icons.block
+                                        : Icons.play_arrow,
                                 color: Colors.white, // Clean white icon
                                 size: 18,
                               ),
@@ -350,7 +360,11 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                                 ),
                               )
                             : Text(
-                                launcher.isRunning(widget.id) || launcher.isError(widget.id) ? 'SHUT DOWN' : 'BOOT UP NOW',
+                                launcher.isRunning(widget.id) || launcher.isError(widget.id)
+                                    ? 'SHUT DOWN'
+                                    : (!launcher.isDockerAvailable && launcher.isInactive(widget.id))
+                                        ? 'DEPENDENCY MISSING'
+                                        : 'BOOT UP NOW',
                                 style: const TextStyle(
                                   color: Colors.white, // Clean white text
                                   fontSize: 16,
