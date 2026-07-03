@@ -38,6 +38,7 @@ dependencies:
   window_manager: ^0.5.1
   bootup_bridge:
     path: ../bootup_bridge
+  path: ^1.9.0
 
 dev_dependencies:
   flutter_test:

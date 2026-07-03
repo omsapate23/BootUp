@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:bootup_bridge/bootup_bridge.dart';
+import 'package:path/path.dart' as p;
 
 enum LauncherState { inactive, booting, running, error }
 
@@ -10,6 +12,11 @@ class LauncherProvider with ChangeNotifier {
   final Map<String, LauncherState> _states = {};
   final Map<String, String> _errorMessages = {};
 
+  // Transaction protection lock state to prevent button flooding / race conditions
+  bool _isProcessing = false;
+
+  bool get isProcessing => _isProcessing;
+
   LauncherState getState(String stackId) => _states[stackId] ?? LauncherState.inactive;
   String getErrorMessage(String stackId) => _errorMessages[stackId] ?? '';
 
@@ -18,32 +25,53 @@ class LauncherProvider with ChangeNotifier {
   bool isRunning(String stackId) => getState(stackId) == LauncherState.running;
   bool isError(String stackId) => getState(stackId) == LauncherState.error;
 
+  /// Traverses upward from the current directory to find the 'bootup_core' directory,
+  /// falling back to a normalized absolute path to ensure robustness across platforms.
+  String _resolveCorePath() {
+    var dir = Directory.current;
+    while (true) {
+      final candidate = Directory(p.join(dir.path, 'bootup_core'));
+      if (candidate.existsSync()) {
+        return candidate.absolute.path;
+      }
+      final parent = dir.parent;
+      if (parent.path == dir.path) {
+        break;
+      }
+      dir = parent;
+    }
+    return Directory('../bootup_core').absolute.path;
+  }
+
   Future<void> bootUp(String stackId) async {
-    if (getState(stackId) != LauncherState.inactive) {
+    // If a transaction lock is active, discard subsequent button triggers
+    if (_isProcessing || getState(stackId) != LauncherState.inactive) {
       return;
     }
 
+    _isProcessing = true;
     _states[stackId] = LauncherState.booting;
     _errorMessages[stackId] = '';
     notifyListeners();
 
     try {
-      // Check if Docker is installed and running
+      // 1. Verify Docker daemon health status
       try {
         await _containerService.checkDockerStatus();
       } catch (e) {
         _states[stackId] = LauncherState.error;
         _errorMessages[stackId] =
             'Docker Desktop is turned off or not installed. Please launch Docker and try again.';
-        notifyListeners();
         return;
       }
 
-      // Invoke startStack on ../bootup_core
-      await _containerService.startStack('../bootup_core');
+      // 2. Resolve blueprint directories dynamically
+      final corePath = _resolveCorePath();
+
+      // 3. Initiate Docker Compose composition
+      await _containerService.startStack(corePath);
 
       _states[stackId] = LauncherState.running;
-      notifyListeners();
     } catch (e) {
       _states[stackId] = LauncherState.error;
       final errorString = e.toString();
@@ -54,35 +82,44 @@ class LauncherProvider with ChangeNotifier {
         _errorMessages[stackId] =
             'Error: ${e.toString().replaceAll('Exception: ', '')}';
       }
+    } finally {
+      _isProcessing = false;
       notifyListeners();
     }
   }
 
   Future<void> shutDown(String stackId) async {
+    // If a transaction lock is active, discard subsequent triggers
+    if (_isProcessing) {
+      return;
+    }
     if (getState(stackId) != LauncherState.running &&
         getState(stackId) != LauncherState.error) {
       return;
     }
 
+    _isProcessing = true;
     _states[stackId] = LauncherState.booting;
     notifyListeners();
 
     try {
-      // Invoke stopStack on ../bootup_core
-      await _containerService.stopStack('../bootup_core');
+      final corePath = _resolveCorePath();
+      await _containerService.stopStack(corePath);
 
       _states[stackId] = LauncherState.inactive;
       _errorMessages[stackId] = '';
-      notifyListeners();
     } catch (e) {
       _states[stackId] = LauncherState.error;
       _errorMessages[stackId] =
           'Failed to stop: ${e.toString().replaceAll('Exception: ', '')}';
+    } finally {
+      _isProcessing = false;
       notifyListeners();
     }
   }
 
   void triggerError(String stackId, String message) {
+    if (_isProcessing) return;
     _states[stackId] = LauncherState.error;
     _errorMessages[stackId] = message;
     notifyListeners();
