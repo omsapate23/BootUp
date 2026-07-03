@@ -1,52 +1,42 @@
 import 'package:flutter/foundation.dart';
 
-enum LauncherState {
-  inactive,
-  booting,
-  running,
-  error,
-}
+enum LauncherState { inactive, booting, running, error }
 
 class LauncherProvider with ChangeNotifier {
-  LauncherState _state = LauncherState.inactive;
-  String _errorMessage = '';
+  // Track environment states independently by an ID string
+  final Map<String, LauncherState> _states = {};
+  final Map<String, String> _errorMessages = {};
 
-  LauncherState get state => _state;
-  String get errorMessage => _errorMessage;
+  LauncherState getState(String stackId) => _states[stackId] ?? LauncherState.inactive;
+  String getErrorMessage(String stackId) => _errorMessages[stackId] ?? '';
 
-  bool get isInactive => _state == LauncherState.inactive;
-  bool get isBooting => _state == LauncherState.booting;
-  bool get isRunning => _state == LauncherState.running;
-  bool get isError => _state == LauncherState.error;
+  bool isInactive(String stackId) => getState(stackId) == LauncherState.inactive;
+  bool isBooting(String stackId) => getState(stackId) == LauncherState.booting;
+  bool isRunning(String stackId) => getState(stackId) == LauncherState.running;
+  bool isError(String stackId) => getState(stackId) == LauncherState.error;
 
-  /// Simulates starting the environment (inactive -> booting -> running)
-  Future<void> bootUp() async {
-    if (_state != LauncherState.inactive) return;
-
-    _state = LauncherState.booting;
-    _errorMessage = '';
+  Future<void> bootUp(String stackId) async {
+    if (getState(stackId) != LauncherState.inactive) return;
+    _states[stackId] = LauncherState.booting;
+    _errorMessages[stackId] = '';
     notifyListeners();
 
-    // Simulate database and container startup processes
+    // Mock delay for UI visual feedback (Phase 3 will replace this)
     await Future.delayed(const Duration(seconds: 3));
-
-    _state = LauncherState.running;
+    _states[stackId] = LauncherState.running;
     notifyListeners();
   }
 
-  /// Simulates stopping the environment (running -> inactive)
-  Future<void> shutDown() async {
-    if (_state != LauncherState.running && _state != LauncherState.error) return;
-
-    _state = LauncherState.inactive;
-    _errorMessage = '';
+  Future<void> shutDown(String stackId) async {
+    if (getState(stackId) != LauncherState.running && getState(stackId) != LauncherState.error) return;
+    _states[stackId] = LauncherState.inactive;
+    _errorMessages[stackId] = '';
     notifyListeners();
   }
 
-  /// Trigger error state for testing UI alerts
-  void triggerError(String message) {
-    _state = LauncherState.error;
-    _errorMessage = message;
+  void triggerError(String stackId, String message) {
+    _states[stackId] = LauncherState.error;
+    _errorMessages[stackId] = message;
     notifyListeners();
   }
 }

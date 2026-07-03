@@ -37,12 +37,14 @@ class TechPatternPainter extends CustomPainter {
 }
 
 class StackCard extends StatefulWidget {
+  final String stackId;
   final String title;
   final String description;
   final List<String> techBadges;
 
   const StackCard({
     super.key,
+    required this.stackId,
     required this.title,
     required this.description,
     required this.techBadges,
@@ -79,7 +81,7 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
     String statusText;
     Widget statusIndicator;
 
-    switch (launcher.state) {
+    switch (launcher.getState(widget.stackId)) {
       case LauncherState.inactive:
         statusColor = Colors.grey;
         statusText = 'Idle';
@@ -205,7 +207,7 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                             color: statusColor.withOpacity(0.3),
                             width: 1,
                           ),
-                          boxShadow: launcher.isRunning
+                          boxShadow: launcher.isRunning(widget.stackId)
                               ? [
                                   BoxShadow(
                                     color: const Color(0xFF00C853).withOpacity(0.2),
@@ -272,7 +274,7 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                   ),
                   const Spacer(),
                   // Error Alert Overlay if state is Error
-                  if (launcher.isError)
+                  if (launcher.isError(widget.stackId))
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16.0),
                       child: Container(
@@ -288,8 +290,8 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                launcher.errorMessage.isNotEmpty
-                                    ? launcher.errorMessage
+                                launcher.getErrorMessage(widget.stackId).isNotEmpty
+                                    ? launcher.getErrorMessage(widget.stackId)
                                     : 'Port 3000 conflicts with another service.',
                                 style: const TextStyle(
                                   color: Colors.redAccent,
@@ -308,7 +310,7 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
-                        boxShadow: (launcher.isRunning || launcher.isBooting)
+                        boxShadow: (launcher.isRunning(widget.stackId) || launcher.isBooting(widget.stackId))
                             ? [
                                 BoxShadow(
                                   color: const Color(0xFF00C853).withOpacity(0.18),
@@ -332,23 +334,23 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                             ),
                           ),
                         ),
-                        onPressed: launcher.isBooting
+                        onPressed: launcher.isBooting(widget.stackId)
                             ? null
                             : () {
-                                if (launcher.isRunning || launcher.isError) {
-                                  launcher.shutDown();
+                                if (launcher.isRunning(widget.stackId) || launcher.isError(widget.stackId)) {
+                                  launcher.shutDown(widget.stackId);
                                 } else {
-                                  launcher.bootUp();
+                                  launcher.bootUp(widget.stackId);
                                 }
                               },
-                        icon: launcher.isBooting
+                        icon: launcher.isBooting(widget.stackId)
                             ? const SizedBox.shrink()
                             : Icon(
-                                launcher.isRunning || launcher.isError ? Icons.stop : Icons.play_arrow,
+                                launcher.isRunning(widget.stackId) || launcher.isError(widget.stackId) ? Icons.stop : Icons.play_arrow,
                                 color: Colors.white, // Clean white icon
                                 size: 18,
                               ),
-                        label: launcher.isBooting
+                        label: launcher.isBooting(widget.stackId)
                             ? const SizedBox(
                                 width: 24,
                                 height: 24,
@@ -358,7 +360,7 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                                 ),
                               )
                             : Text(
-                                launcher.isRunning || launcher.isError ? 'SHUT DOWN' : 'BOOT UP NOW',
+                                launcher.isRunning(widget.stackId) || launcher.isError(widget.stackId) ? 'SHUT DOWN' : 'BOOT UP NOW',
                                 style: const TextStyle(
                                   color: Colors.white, // Clean white text
                                   fontSize: 16,
