@@ -142,7 +142,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ),
                                 ),
                                 const Spacer(),
-                                if (index == 1 && launcher.isRunning('web_dev_kit'))
+                                if (index == 1 && launcher.isRunning('web_kit'))
                                   Container(
                                     margin: const EdgeInsets.only(right: 16),
                                     width: 8,
@@ -242,7 +242,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           color: Colors.white.withOpacity(0.3),
                         ),
                         onPressed: () {
-                          launcher.triggerError('web_dev_kit', 'Port 3000 is occupied by another app. Click shut down to reset.');
+                          launcher.triggerError('web_kit', 'Port 3000 is occupied.');
                         },
                       ),
                     ],
@@ -262,7 +262,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 childAspectRatio: 1.35,
                                 children: const [
                                   StackCard(
-                                    stackId: 'web_dev_kit',
+                                    id: 'web_kit',
                                     title: 'Full-Stack Web Dev Kit',
                                     description: 'A complete Node.js app environment paired with a MongoDB database, running fully containerized inside isolated workspace borders.',
                                     techBadges: ['NodeJS 20', 'Express', 'MongoDB 6.0', 'Mongoose'],
@@ -272,7 +272,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     opacity: 0.5,
                                     child: AbsorbPointer(
                                       child: StackCard(
-                                        stackId: 'python_ds_kit',
+                                        id: 'python_sandbox',
                                         title: 'Python Data Science Kit',
                                         description: 'Pre-configured Python Jupyter Notebook bundled with NumPy, Pandas, Matplotlib, and PostgreSQL databases.',
                                         techBadges: ['Python 3.11', 'Jupyter', 'PostgreSQL 15', 'Pandas'],
@@ -285,12 +285,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           )
                         : _selectedNavigationIndex == 1
                             ? Center(
-                                child: launcher.isRunning('web_dev_kit')
+                                child: launcher.isRunning('web_kit')
                                     ? SizedBox(
                                         width: 400,
                                         height: 300,
                                         child: StackCard(
-                                          stackId: 'web_dev_kit',
+                                          id: 'web_kit',
                                           title: 'Full-Stack Web Dev Kit',
                                           description: 'A complete Node.js app environment paired with a MongoDB database, running fully containerized inside isolated workspace borders.',
                                           techBadges: ['NodeJS 20', 'Express', 'MongoDB 6.0', 'Mongoose'],

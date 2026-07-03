@@ -11,11 +11,13 @@ class LauncherProvider with ChangeNotifier {
   // Track environment states independently by an ID string
   final Map<String, LauncherState> _states = {};
   final Map<String, String> _errorMessages = {};
+  bool _isDockerAvailable = false;
 
   // Transaction protection lock state to prevent button flooding / race conditions
   bool _isProcessing = false;
 
   bool get isProcessing => _isProcessing;
+  bool get isDockerAvailable => _isDockerAvailable;
 
   LauncherState getState(String stackId) => _states[stackId] ?? LauncherState.inactive;
   String getErrorMessage(String stackId) => _errorMessages[stackId] ?? '';
@@ -58,7 +60,9 @@ class LauncherProvider with ChangeNotifier {
       // 1. Verify Docker daemon health status
       try {
         await _containerService.checkDockerStatus();
+        _isDockerAvailable = true;
       } catch (e) {
+        _isDockerAvailable = false;
         _states[stackId] = LauncherState.error;
         _errorMessages[stackId] =
             'Docker Desktop is turned off or not installed. Please launch Docker and try again.';
