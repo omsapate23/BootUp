@@ -12,32 +12,14 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedNavigationIndex = 0;
-  late LauncherProvider _launcherProvider;
 
   @override
   void initState() {
     super.initState();
-    _launcherProvider = Provider.of<LauncherProvider>(context, listen: false);
-    _launcherProvider.addListener(_onLauncherStateChanged);
-    
     // Probe Docker availability immediately on launch so the footer is accurate
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _launcherProvider.checkSystemDependencies();
+      Provider.of<LauncherProvider>(context, listen: false).checkSystemDependencies();
     });
-  }
-
-  @override
-  void dispose() {
-    _launcherProvider.removeListener(_onLauncherStateChanged);
-    super.dispose();
-  }
-
-  void _onLauncherStateChanged() {
-    if (_launcherProvider.isRunning('web_kit') && _selectedNavigationIndex == 0) {
-      setState(() {
-        _selectedNavigationIndex = 1;
-      });
-    }
   }
 
   final List<Map<String, dynamic>> _navigationItems = [
@@ -61,10 +43,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final launcher = context.watch<LauncherProvider>();
-    final isWebActive = launcher.getState('web_kit') == LauncherState.running;
+    final isRunning = launcher.isRunning('web_kit');
 
     Widget rightContent;
-    if (_selectedNavigationIndex == 1 && isWebActive) {
+    if (_selectedNavigationIndex == 1 && isRunning) {
       rightContent = _buildActiveWorkspaceCanvas(context, 'web_kit');
     } else {
       rightContent = Padding(
@@ -151,12 +133,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     )
                   : _selectedNavigationIndex == 1
                       ? Center(
-                          child: Text(
-                            'No environments are currently running.',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.4),
-                              fontSize: 16,
-                            ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.cloud_off,
+                                size: 64,
+                                color: Colors.white.withOpacity(0.15),
+                              ),
+                              const SizedBox(height: 16),
+                              const Text(
+                                'No environments are currently running.',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Head over to Explore Stacks to boot your workspace.',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.35),
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
                           ),
                         )
                       : Center(
@@ -464,7 +466,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Row(
               children: [
-                Icon(Icons.arrow_back, color: Colors.white.withOpacity(0.3), size: 20),
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, size: 20),
+                  color: Colors.white.withOpacity(0.6),
+                  tooltip: 'Back to catalog',
+                  onPressed: () {
+                    setState(() {
+                      _selectedNavigationIndex = 0;
+                    });
+                  },
+                ),
                 const SizedBox(width: 16),
                 Icon(Icons.arrow_forward, color: Colors.white.withOpacity(0.3), size: 20),
                 const SizedBox(width: 24),
@@ -498,7 +509,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              launcher.launchSystemBrowser('http://localhost:$port');
+                            },
                             borderRadius: BorderRadius.circular(4),
                             child: const Padding(
                               padding: EdgeInsets.all(4.0),

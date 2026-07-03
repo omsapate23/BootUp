@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:bootup_bridge/bootup_bridge.dart';
@@ -24,6 +25,10 @@ class LauncherProvider with ChangeNotifier {
   // Transaction protection lock state to prevent button flooding / race conditions
   bool _isProcessing = false;
 
+  String _liveCpu = '0.0 %';
+  String _liveMemory = '0 MB';
+  Timer? _metricsTimer;
+
   bool get isProcessing => _isProcessing;
   bool get isDockerAvailable => _isDockerAvailable;
 
@@ -35,8 +40,8 @@ class LauncherProvider with ChangeNotifier {
   bool isRunning(String stackId) => getState(stackId) == LauncherState.running;
   bool isError(String stackId) => getState(stackId) == LauncherState.error;
 
-  String getCpuUsage(String id) => isRunning(id) ? "1.8 %" : "0.0 %";
-  String getMemoryUsage(String id) => isRunning(id) ? "142 MB" : "0 MB";
+  String getCpuUsage(String id) => isRunning(id) ? _liveCpu : "0.0 %";
+  String getMemoryUsage(String id) => isRunning(id) ? _liveMemory : "0 MB";
   String getNetworkIo(String id) => isRunning(id) ? "12 KB / 8 KB" : "0 KB / 0 KB";
   String getDiskReadWrite(String id) => isRunning(id) ? "0 B / 4 KB" : "0 B / 0 B";
 
@@ -90,6 +95,7 @@ class LauncherProvider with ChangeNotifier {
       await _containerService.startStack(corePath);
 
       _states[stackId] = LauncherState.running;
+      _startMetricsStreaming(stackId);
       notifyListeners();
       // Latency delay to ensure container sockets bind cleanly to the host network
       await Future.delayed(const Duration(seconds: 2));
@@ -119,6 +125,11 @@ class LauncherProvider with ChangeNotifier {
         getState(stackId) != LauncherState.error) {
       return;
     }
+
+    _metricsTimer?.cancel();
+    _metricsTimer = null;
+    _liveCpu = '0.0 %';
+    _liveMemory = '0 MB';
 
     // DEADLOCK GUARD: If Docker is unavailable and the card is in error state,
     // calling stopStack would throw and re-trap the card in an error loop.
@@ -183,5 +194,33 @@ class LauncherProvider with ChangeNotifier {
     _states[stackId] = LauncherState.error;
     _errorMessages[stackId] = message;
     notifyListeners();
+  }
+
+  void _startMetricsStreaming(String stackId) {
+    _metricsTimer?.cancel();
+    _metricsTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+      if (!isRunning(stackId)) {
+        timer.cancel();
+        return;
+      }
+      try {
+        final process = await Process.run('docker', ['stats', '--no-stream', '--format', '{{.CPUPerc}}|{{.MemUsage}}']);
+        if (process.exitCode == 0) {
+          final output = process.stdout.toString().trim();
+          final parts = output.split('|');
+          if (parts.length >= 2) {
+            _liveCpu = parts[0];
+            _liveMemory = parts[1];
+            notifyListeners();
+          }
+        }
+      } catch (_) {}
+    });
+  }
+
+  @override
+  void dispose() {
+    _metricsTimer?.cancel();
+    super.dispose();
   }
 }
