@@ -293,6 +293,35 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                         ),
                       ),
                     ),
+                  // Optional secondary action: Open Workspace (only when running)
+                  if (launcher.isRunning(widget.id)) ...[
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF007BFF),
+                          side: const BorderSide(color: Color(0xFF007BFF), width: 1.5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        onPressed: () {
+                          launcher.launchUrl('http://localhost:3000');
+                        },
+                        icon: const Icon(Icons.open_in_new, size: 18),
+                        label: const Text(
+                          'OPEN WORKSPACE',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
                   // Big Action Button with Glowing Border and Dark Background
                   SizedBox(
                     width: double.infinity,

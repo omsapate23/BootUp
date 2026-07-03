@@ -76,6 +76,8 @@ class LauncherProvider with ChangeNotifier {
       await _containerService.startStack(corePath);
 
       _states[stackId] = LauncherState.running;
+      // Trigger an async browser command to automatically open the workspace
+      launchUrl('http://localhost:3000');
     } catch (e) {
       _states[stackId] = LauncherState.error;
       final errorString = e.toString();
@@ -142,6 +144,21 @@ class LauncherProvider with ChangeNotifier {
       _isDockerAvailable = false;
     }
     notifyListeners();
+  }
+
+  /// Launches a URL using the host platform's default web browser.
+  Future<void> launchUrl(String url) async {
+    try {
+      if (Platform.isWindows) {
+        await Process.run('cmd', ['/c', 'start', '', url]);
+      } else if (Platform.isMacOS) {
+        await Process.run('open', [url]);
+      } else if (Platform.isLinux) {
+        await Process.run('xdg-open', [url]);
+      }
+    } catch (e) {
+      debugPrint('Failed to launch URL: $e');
+    }
   }
 
   void triggerError(String stackId, String message) {
