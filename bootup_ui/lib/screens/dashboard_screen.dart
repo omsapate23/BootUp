@@ -46,9 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final isRunning = launcher.isRunning('web_kit');
 
     Widget rightContent;
-    if (_selectedNavigationIndex == 1 && isRunning) {
-      rightContent = _buildActiveWorkspaceCanvas(context, 'web_kit');
-    } else {
+    if (_selectedNavigationIndex == 0) {
       rightContent = Padding(
         padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 32.0),
         child: Column(
@@ -96,92 +94,96 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 40),
             // Dashboard Content Grid based on selection
             Expanded(
-              child: _selectedNavigationIndex == 0
-                  ? LayoutBuilder(
-                      builder: (context, constraints) {
-                        // Dynamically adjust columns based on desktop viewport width
-                        final columns = constraints.maxWidth > 800 ? 2 : 1;
-                        final hasRunning = launcher.isRunning('web_kit');
-                        final aspectRatio = hasRunning ? 0.95 : 1.35;
-                        return GridView.count(
-                          crossAxisCount: columns,
-                          crossAxisSpacing: 24,
-                          mainAxisSpacing: 24,
-                          childAspectRatio: aspectRatio,
-                          children: const [
-                            StackCard(
-                              id: 'web_kit',
-                              title: 'Full-Stack Web Dev Kit',
-                              description: 'A complete Node.js app environment paired with a MongoDB database, running fully containerized inside isolated workspace borders.',
-                              techBadges: ['NodeJS 20', 'Express', 'MongoDB 6.0', 'Mongoose'],
-                            ),
-                            // Placeholder stack cards for premium tiers
-                            Opacity(
-                              opacity: 0.5,
-                              child: AbsorbPointer(
-                                child: StackCard(
-                                  id: 'python_sandbox',
-                                  title: 'Python Data Science Kit',
-                                  description: 'Pre-configured Python Jupyter Notebook bundled with NumPy, Pandas, Matplotlib, and PostgreSQL databases.',
-                                  techBadges: ['Python 3.11', 'Jupyter', 'PostgreSQL 15', 'Pandas'],
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    )
-                  : _selectedNavigationIndex == 1
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.cloud_off,
-                                size: 64,
-                                color: Colors.white.withOpacity(0.15),
-                              ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'No environments are currently running.',
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Head over to Explore Stacks to boot your workspace.',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.35),
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.settings_suggest,
-                                size: 64,
-                                color: Colors.white.withOpacity(0.15),
-                              ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'Settings Screen Placeholder',
-                                style: TextStyle(
-                                  color: Colors.white54,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  // Dynamically adjust columns based on desktop viewport width
+                  final columns = constraints.maxWidth > 800 ? 2 : 1;
+                  final hasRunning = launcher.isRunning('web_kit');
+                  final aspectRatio = hasRunning ? 0.95 : 1.35;
+                  return GridView.count(
+                    crossAxisCount: columns,
+                    crossAxisSpacing: 24,
+                    mainAxisSpacing: 24,
+                    childAspectRatio: aspectRatio,
+                    children: const [
+                      StackCard(
+                        id: 'web_kit',
+                        title: 'Full-Stack Web Dev Kit',
+                        description: 'A complete Node.js app environment paired with a MongoDB database, running fully containerized inside isolated workspace borders.',
+                        techBadges: ['NodeJS 20', 'Express', 'MongoDB 6.0', 'Mongoose'],
+                      ),
+                      // Placeholder stack cards for premium tiers
+                      Opacity(
+                        opacity: 0.5,
+                        child: AbsorbPointer(
+                          child: StackCard(
+                            id: 'python_sandbox',
+                            title: 'Python Data Science Kit',
+                            description: 'Pre-configured Python Jupyter Notebook bundled with NumPy, Pandas, Matplotlib, and PostgreSQL databases.',
+                            techBadges: ['Python 3.11', 'Jupyter', 'PostgreSQL 15', 'Pandas'],
                           ),
                         ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    } else if (_selectedNavigationIndex == 1) {
+      if (isRunning) {
+        rightContent = _buildActiveWorkspaceCanvas(context, 'web_kit');
+      } else {
+        rightContent = Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.cloud_off,
+                size: 64,
+                color: Colors.white.withOpacity(0.15),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'No environments are currently running.',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Head over to Explore Stacks to boot your workspace.',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.35),
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    } else {
+      rightContent = Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.settings_suggest,
+              size: 64,
+              color: Colors.white.withOpacity(0.15),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Settings Screen Placeholder',
+              style: TextStyle(
+                color: Colors.white54,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -657,20 +659,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               Positioned(
                                 top: 20,
                                 right: 20,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF007BFF).withOpacity(0.2),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () => launcher.launchSystemBrowser('http://localhost:3000'),
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: const Color(0xFF007BFF).withOpacity(0.3)),
-                                  ),
-                                  child: const Text(
-                                    'LIVE WORKSPACE',
-                                    style: TextStyle(
-                                      color: Color(0xFF007BFF),
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.5,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF007BFF).withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: const Color(0xFF007BFF).withOpacity(0.3)),
+                                      ),
+                                      child: const Text(
+                                        'LIVE WORKSPACE',
+                                        style: TextStyle(
+                                          color: Color(0xFF007BFF),
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
