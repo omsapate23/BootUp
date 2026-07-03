@@ -46,9 +46,9 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Roboto', // Matches standard modern desktop layouts
         colorScheme: ColorScheme.fromSeed(
           brightness: Brightness.dark,
-          seedColor: const Color(0xFF6C63FF),
-          primary: const Color(0xFF6C63FF),
-          surface: const Color(0xFF121216),
+          seedColor: const Color(0xFF00C853),
+          primary: const Color(0xFF00C853),
+          surface: const Color(0xFF1A1A1A),
         ),
         useMaterial3: true,
       ),

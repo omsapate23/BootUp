@@ -36,14 +36,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final launcher = context.watch<LauncherProvider>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121216),
+      backgroundColor: const Color(0xFF1A1A1A),
       body: Row(
         children: [
           // Left Sidebar (Navigation Rail)
           Container(
             width: 250,
             decoration: BoxDecoration(
-              color: const Color(0xFF181822),
+              color: const Color(0xFF262626),
               border: Border(
                 right: BorderSide(
                   color: Colors.white.withOpacity(0.05),
@@ -62,15 +62,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF6C63FF).withOpacity(0.15),
+                          color: const Color(0xFF00C853).withOpacity(0.15),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: const Color(0xFF6C63FF).withOpacity(0.3),
+                            color: const Color(0xFF00C853).withOpacity(0.3),
                           ),
                         ),
                         child: const Icon(
                           Icons.bolt,
-                          color: Color(0xFF6C63FF),
+                          color: Color(0xFF00C853),
                           size: 24,
                         ),
                       ),
@@ -108,12 +108,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             height: 48,
                             decoration: BoxDecoration(
                               color: isSelected 
-                                  ? const Color(0xFF6C63FF).withOpacity(0.08)
+                                  ? const Color(0xFF00C853).withOpacity(0.08)
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(12),
                               border: isSelected
                                   ? Border.all(
-                                      color: const Color(0xFF6C63FF).withOpacity(0.15),
+                                      color: const Color(0xFF00C853).withOpacity(0.15),
                                       width: 1,
                                     )
                                   : null,
@@ -124,7 +124,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 Icon(
                                   isSelected ? item['activeIcon'] : item['icon'],
                                   color: isSelected 
-                                      ? const Color(0xFF6C63FF) 
+                                      ? const Color(0xFF00C853) 
                                       : Colors.white.withOpacity(0.6),
                                   size: 20,
                                 ),

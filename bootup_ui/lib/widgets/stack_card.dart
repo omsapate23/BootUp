@@ -2,6 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/launcher_provider.dart';
 
+class TechPatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Light grey thin diagonal lines
+    final greyPaint = Paint()
+      ..color = Colors.white.withOpacity(0.015)
+      ..strokeWidth = 1.0;
+
+    for (double i = -size.height; i < size.width; i += 24) {
+      canvas.drawLine(
+        Offset(i, 0),
+        Offset(i + size.height, size.height),
+        greyPaint,
+      );
+    }
+
+    // Sharp green subtle accent diagonal lines
+    final greenPaint = Paint()
+      ..color = const Color(0xFF00C853).withOpacity(0.03)
+      ..strokeWidth = 1.5;
+
+    for (double i = -size.height; i < size.width; i += 96) {
+      canvas.drawLine(
+        Offset(i, 0),
+        Offset(i + size.height, size.height),
+        greenPaint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
 class StackCard extends StatefulWidget {
   final String title;
   final String description;
@@ -40,7 +74,7 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
   Widget build(BuildContext context) {
     final launcher = context.watch<LauncherProvider>();
 
-    // Determine colors and status texts based on launcher state
+    // Determine status values based on state
     Color statusColor;
     String statusText;
     Widget statusIndicator;
@@ -83,17 +117,17 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
         );
         break;
       case LauncherState.running:
-        statusColor = const Color(0xFF00FF66); // Neon green
+        statusColor = const Color(0xFF00C853); // Sharp green
         statusText = 'Active';
         statusIndicator = Container(
           width: 12,
           height: 12,
           decoration: const BoxDecoration(
-            color: Color(0xFF00FF66),
+            color: Color(0xFF00C853),
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Color(0xFF00FF66),
+                color: Color(0xFF00C853),
                 blurRadius: 8,
                 spreadRadius: 1,
               ),
@@ -117,14 +151,7 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
 
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF2C2C35),
-            const Color(0xFF1E1E24),
-          ],
-        ),
+        color: const Color(0xFF212121), // Charcoal grey card background
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: Colors.white.withOpacity(0.08),
@@ -138,165 +165,211 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18.5),
+        child: Stack(
           children: [
-            // Header Row (Title & Status)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    widget.title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-                // Status Badge
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(
-                      color: statusColor.withOpacity(0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      statusIndicator,
-                      const SizedBox(width: 8),
-                      Text(
-                        statusText,
-                        style: TextStyle(
-                          color: statusColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // Description
-            Text(
-              widget.description,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
-                fontSize: 14,
-                height: 1.4,
+            // High-tech abstract diagonal linear patterns background
+            Positioned.fill(
+              child: CustomPaint(
+                painter: TechPatternPainter(),
               ),
             ),
-            const SizedBox(height: 20),
-            // Technology Badges
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: widget.techBadges.map((tech) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.05),
-                      width: 1,
-                    ),
-                  ),
-                  child: Text(
-                    tech,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-            const Spacer(),
-            // Error Alert Overlay if state is Error
-            if (launcher.isError)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.redAccent.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.redAccent.withOpacity(0.2)),
-                  ),
-                  child: Row(
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header Row (Title & Status)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(Icons.error_outline, color: Colors.redAccent, size: 20),
-                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          launcher.errorMessage.isNotEmpty
-                              ? launcher.errorMessage
-                              : 'Port 3000 conflicts with another service.',
+                          widget.title,
                           style: const TextStyle(
-                            color: Colors.redAccent,
-                            fontSize: 12,
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            // Big Action Button
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: launcher.isRunning 
-                      ? const Color(0xFFFF3B30) // Red
-                      : const Color(0xFF6C63FF), // Neon Purple
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                onPressed: launcher.isBooting
-                    ? null
-                    : () {
-                        if (launcher.isRunning || launcher.isError) {
-                          launcher.shutDown();
-                        } else {
-                          launcher.bootUp();
-                        }
-                      },
-                child: launcher.isBooting
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2.5,
+                      // Status Badge with glowing outlining active states
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: statusColor.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: statusColor.withOpacity(0.3),
+                            width: 1,
+                          ),
+                          boxShadow: launcher.isRunning
+                              ? [
+                                  BoxShadow(
+                                    color: const Color(0xFF00C853).withOpacity(0.2),
+                                    blurRadius: 8,
+                                    spreadRadius: 1,
+                                  ),
+                                ]
+                              : null,
                         ),
-                      )
-                    : Text(
-                        launcher.isRunning || launcher.isError ? 'Shut Down' : 'Boot Up',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            statusIndicator,
+                            const SizedBox(width: 8),
+                            Text(
+                              statusText,
+                              style: TextStyle(
+                                color: statusColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // Description
+                  Text(
+                    widget.description,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.7),
+                      fontSize: 14,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Technology Badges
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: widget.techBadges.map((tech) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF004D40), // Deep green background
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: const Color(0xFF00C853).withOpacity(0.15),
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          tech,
+                          style: const TextStyle(
+                            color: Colors.white, // Sharp white text
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const Spacer(),
+                  // Error Alert Overlay if state is Error
+                  if (launcher.isError)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.redAccent.withOpacity(0.2)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error_outline, color: Colors.redAccent, size: 20),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                launcher.errorMessage.isNotEmpty
+                                    ? launcher.errorMessage
+                                    : 'Port 3000 conflicts with another service.',
+                                style: const TextStyle(
+                                  color: Colors.redAccent,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  // Big Action Button with Glowing Border and Dark Background
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: (launcher.isRunning || launcher.isBooting)
+                            ? [
+                                BoxShadow(
+                                  color: const Color(0xFF00C853).withOpacity(0.18),
+                                  blurRadius: 10,
+                                  spreadRadius: 1,
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF333333), // Dark grey button background
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shadowColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: BorderSide(
+                              color: const Color(0xFF00C853).withOpacity(0.4), // Subtle green glowing accent outline
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                        onPressed: launcher.isBooting
+                            ? null
+                            : () {
+                                if (launcher.isRunning || launcher.isError) {
+                                  launcher.shutDown();
+                                } else {
+                                  launcher.bootUp();
+                                }
+                              },
+                        icon: launcher.isBooting
+                            ? const SizedBox.shrink()
+                            : Icon(
+                                launcher.isRunning || launcher.isError ? Icons.stop : Icons.play_arrow,
+                                color: Colors.white, // Clean white icon
+                                size: 18,
+                              ),
+                        label: launcher.isBooting
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2.5,
+                                ),
+                              )
+                            : Text(
+                                launcher.isRunning || launcher.isError ? 'SHUT DOWN' : 'BOOT UP NOW',
+                                style: const TextStyle(
+                                  color: Colors.white, // Clean white text
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
