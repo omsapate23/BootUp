@@ -97,35 +97,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   // Dynamically adjust columns based on desktop viewport width
-                  final columns = constraints.maxWidth > 800 ? 2 : 1;
-                  final hasRunning = launcher.isRunning('web_kit');
-                  final aspectRatio = hasRunning ? 0.95 : 1.35;
-                  return GridView.count(
-                    crossAxisCount: columns,
-                    crossAxisSpacing: 24,
-                    mainAxisSpacing: 24,
-                    childAspectRatio: aspectRatio,
-                    children: const [
-                      StackCard(
-                        id: 'web_kit',
-                        title: 'Full-Stack Web Dev Kit',
-                        description: 'A complete Node.js app environment paired with a MongoDB database, running fully containerized inside isolated workspace borders.',
-                        techBadges: ['NodeJS 20', 'Express', 'MongoDB 6.0', 'Mongoose'],
-                      ),
-                      // Placeholder stack cards for premium tiers
-                      Opacity(
-                        opacity: 0.5,
-                        child: AbsorbPointer(
-                          child: StackCard(
-                            id: 'python_sandbox',
-                            title: 'Python Data Science Kit',
-                            description: 'Pre-configured Python Jupyter Notebook bundled with NumPy, Pandas, Matplotlib, and PostgreSQL databases.',
-                            techBadges: ['Python 3.11', 'Jupyter', 'PostgreSQL 15', 'Pandas'],
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
+                   final columns = constraints.maxWidth > 800 ? 2 : 1;
+                   final hasRunning = launcher.isRunning('web_kit') || launcher.isRunning('python_sandbox');
+                   final aspectRatio = hasRunning ? 0.95 : 1.35;
+                   return GridView.count(
+                     crossAxisCount: columns,
+                     crossAxisSpacing: 24,
+                     mainAxisSpacing: 24,
+                     childAspectRatio: aspectRatio,
+                     children: const [
+                       StackCard(
+                         id: 'web_kit',
+                         title: 'Full-Stack Web Dev Kit',
+                         description: 'A complete Node.js app environment paired with a MongoDB database, running fully containerized inside isolated workspace borders.',
+                         techBadges: ['NodeJS 20', 'Express', 'MongoDB 6.0', 'Mongoose'],
+                       ),
+                       StackCard(
+                         id: 'python_sandbox',
+                         title: 'Python Data Science Kit',
+                         description: 'Pre-configured Python Jupyter Notebook bundled with NumPy, Pandas, Matplotlib, and PostgreSQL databases.',
+                         techBadges: ['Python 3.11', 'Jupyter', 'PostgreSQL 15', 'Pandas'],
+                       ),
+                     ],
+                   );
                 },
               ),
             ),
@@ -604,11 +598,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         size: 48,
                                       ),
                                     ),
-                                    const SizedBox(height: 24),
                                     Text(
-                                      stackId == 'web_kit'
-                                          ? 'MERN Stack Editor Workspace'
-                                          : 'Python Jupyter Analytics Hub',
+                                      launcher.getStackConfig(stackId)['name'] ??
+                                          (stackId == 'web_kit'
+                                              ? 'MERN Stack Editor Workspace'
+                                              : 'Python Jupyter Analytics Hub'),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 20,

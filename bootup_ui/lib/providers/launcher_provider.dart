@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:bootup_bridge/bootup_bridge.dart';
@@ -20,7 +21,65 @@ class LauncherProvider with ChangeNotifier {
     'python_sandbox': '8888',
   };
 
-  String getStackPort(String id) => _stackPorts[id] ?? '3000';
+  final Map<String, Map<String, dynamic>> _stackConfigs = {
+    'web_kit': {'name': 'Full-Stack Web Dev Kit', 'port': '3000', 'includeDb': true},
+    'python_sandbox': {'name': 'Python Data Science Sandbox', 'port': '8888', 'includeDb': false},
+  };
+
+  LauncherProvider() {
+    _loadStackConfigs();
+  }
+
+  Map<String, dynamic> getStackConfig(String id) => _stackConfigs[id] ?? {};
+
+  void updateStackConfig(String id, String key, dynamic value) {
+    if (_stackConfigs.containsKey(id)) {
+      _stackConfigs[id]![key] = value;
+      _saveStackConfigs();
+      notifyListeners();
+    }
+  }
+
+  void _loadStackConfigs() {
+    try {
+      final file = File(_getConfigFilepath());
+      if (file.existsSync()) {
+        final content = file.readAsStringSync();
+        final Map<String, dynamic> decoded = jsonDecode(content);
+        decoded.forEach((key, value) {
+          if (_stackConfigs.containsKey(key) && value is Map) {
+            _stackConfigs[key]!.addAll(Map<String, dynamic>.from(value));
+          }
+        });
+      }
+    } catch (_) {}
+  }
+
+  void _saveStackConfigs() {
+    try {
+      final file = File(_getConfigFilepath());
+      file.parent.createSync(recursive: true);
+      file.writeAsStringSync(jsonEncode(_stackConfigs), flush: true);
+    } catch (_) {}
+  }
+
+  String _getConfigFilepath() {
+    var dir = Directory.current;
+    while (true) {
+      final candidate = Directory(p.join(dir.path, '.agents'));
+      if (candidate.parent.existsSync()) {
+        return p.join(candidate.path, 'stack_configs.json');
+      }
+      final parent = dir.parent;
+      if (parent.path == dir.path) {
+        break;
+      }
+      dir = parent;
+    }
+    return p.join(Directory.current.path, 'stack_configs.json');
+  }
+
+  String getStackPort(String id) => _stackConfigs[id]?['port'] ?? _stackPorts[id] ?? '3000';
 
   // Transaction protection lock state to prevent button flooding / race conditions
   bool _isProcessing = false;

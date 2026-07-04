@@ -1,40 +1,12 @@
-# ==============================================================================
-# BOOTUP CORE - PYTHON SANDBOX DEVELOPMENT TEMPLATE
-# ==============================================================================
 version: '3.8'
 
 services:
-  jupyter:
+  notebook_workspace:
     image: jupyter/datascience-notebook:latest
-    container_name: bootup_jupyter_sandbox
+    container_name: bootup_python_notebook
     ports:
-      - "8888:8888"
+      - "127.0.0.1:8888:8888"
     volumes:
       - ./notebooks:/home/jovyan/work
     environment:
-      - JUPYTER_TOKEN=
-      - JUPYTER_ENABLE_LAB=yes
-    networks:
-      - bootup_network
-
-  database:
-    image: postgres:15-alpine
-    container_name: bootup_postgres_db
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_DB=bootup_ds
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-    networks:
-      - bootup_network
-
-volumes:
-  pg_data:
-    driver: local
-
-networks:
-  bootup_network:
-    driver: bridge
+      - JUPYTER_TOKEN=none # Disables token onboarding screen for simplified student usage

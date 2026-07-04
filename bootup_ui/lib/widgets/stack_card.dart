@@ -96,6 +96,163 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
     });
   }
 
+  void _showConfigDrawer(BuildContext context, LauncherProvider launcher) {
+    final config = launcher.getStackConfig(widget.id);
+    final nameController = TextEditingController(text: config['name'] ?? widget.title);
+    final portController = TextEditingController(text: config['port'] ?? launcher.getStackPort(widget.id));
+    bool includeDb = config['includeDb'] ?? true;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF1E1E1E),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 24,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Configure ${widget.title}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white60),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  // Display Name Field
+                  const Text(
+                    'Environment Display Name',
+                    style: TextStyle(
+                      color: Colors.white60,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: nameController,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: 'Enter custom name',
+                      hintStyle: const TextStyle(color: Colors.white30),
+                      filled: true,
+                      fillColor: const Color(0xFF2D2D2D),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: Color(0xFF007BFF), width: 1.5),
+                      ),
+                    ),
+                    onChanged: (val) {
+                      launcher.updateStackConfig(widget.id, 'name', val);
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  // Host Port Field
+                  const Text(
+                    'Host Connection Port',
+                    style: TextStyle(
+                      color: Colors.white60,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: portController,
+                    keyboardType: TextInputType.number,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: 'Enter host port (e.g. 3000)',
+                      hintStyle: const TextStyle(color: Colors.white30),
+                      filled: true,
+                      fillColor: const Color(0xFF2D2D2D),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: Color(0xFF007BFF), width: 1.5),
+                      ),
+                    ),
+                    onChanged: (val) {
+                      launcher.updateStackConfig(widget.id, 'port', val);
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  // Include DB Toggle
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Enable Isolated Database Container',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Includes MongoDB/PostgreSQL in runtime.',
+                            style: TextStyle(
+                              color: Colors.white38,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Switch(
+                        value: includeDb,
+                        activeColor: const Color(0xFF007BFF),
+                        onChanged: (val) {
+                          setModalState(() {
+                            includeDb = val;
+                          });
+                          launcher.updateStackConfig(widget.id, 'includeDb', val);
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -226,7 +383,7 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                     children: [
                       Expanded(
                         child: Text(
-                          widget.title,
+                          launcher.getStackConfig(widget.id)['name'] ?? widget.title,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 22,
@@ -270,6 +427,15 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                             ),
                           ],
                         ),
+                      ),
+                      const SizedBox(width: 8),
+                      // Settings Gear Icon button
+                      IconButton(
+                        icon: const Icon(Icons.settings_outlined, color: Colors.white70, size: 20),
+                        tooltip: 'Configure stack',
+                        onPressed: launcher.isInactive(widget.id)
+                            ? () => _showConfigDrawer(context, launcher)
+                            : null,
                       ),
                     ],
                   ),

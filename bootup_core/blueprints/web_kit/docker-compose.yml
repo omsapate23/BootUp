@@ -80,7 +80,15 @@ services:
       - ./project_code:/home/coder/project
     environment:
       - CS_DISABLE_TELEMETRY=true
-    command: --auth none --bind-addr 0.0.0.0:8443 /home/coder/project
+      - AUTH=none
+    # Bootstrap command to automatically inject user settings before launching the editor process
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        mkdir -p /home/coder/.local/share/code-server/User
+        echo '{"workbench.colorTheme": "Default Dark Modern", "editor.fontSize": 14}' > /home/coder/.local/share/code-server/User/settings.json
+        exec /usr/bin/code-server --auth none --bind-addr 0.0.0.0:8443 /home/coder/project
     networks:
       - bootup_network
 
