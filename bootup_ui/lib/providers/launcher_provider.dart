@@ -84,12 +84,14 @@ class LauncherProvider with ChangeNotifier {
   // Transaction protection lock state to prevent button flooding / race conditions
   bool _isProcessing = false;
 
-  String _liveCpu = '0.0 %';
-  String _liveMemory = '0 MB';
+  final Map<String, String> _cpuMetrics = {};
+  final Map<String, String> _memMetrics = {};
   final Map<String, Timer?> _metricsTimers = {};
 
   bool get isProcessing => _isProcessing;
   bool get isDockerAvailable => _isDockerAvailable;
+
+  List<String> get activeStacks => _stackConfigs.keys.toList();
 
   LauncherState getState(String stackId) => _states[stackId] ?? LauncherState.inactive;
   String getErrorMessage(String stackId) => _errorMessages[stackId] ?? '';
@@ -99,8 +101,8 @@ class LauncherProvider with ChangeNotifier {
   bool isRunning(String stackId) => getState(stackId) == LauncherState.running;
   bool isError(String stackId) => getState(stackId) == LauncherState.error;
 
-  String getCpuUsage(String id) => isRunning(id) ? _liveCpu : "0.0 %";
-  String getMemoryUsage(String id) => isRunning(id) ? _liveMemory : "0 MB";
+  String getCpuUsage(String id) => isRunning(id) ? (_cpuMetrics[id] ?? "0.0 %") : "0.0 %";
+  String getMemoryUsage(String id) => isRunning(id) ? (_memMetrics[id] ?? "0 MB") : "0 MB";
   String getNetworkIo(String id) => isRunning(id) ? "12 KB / 8 KB" : "0 KB / 0 KB";
   String getDiskReadWrite(String id) => isRunning(id) ? "0 B / 4 KB" : "0 B / 0 B";
 
@@ -208,8 +210,8 @@ class LauncherProvider with ChangeNotifier {
 
     _metricsTimers[stackId]?.cancel();
     _metricsTimers.remove(stackId);
-    _liveCpu = '0.0 %';
-    _liveMemory = '0 MB';
+    _cpuMetrics.remove(stackId);
+    _memMetrics.remove(stackId);
 
     // DEADLOCK GUARD: If Docker is unavailable and the card is in error state,
     // calling stopStack would throw and re-trap the card in an error loop.
@@ -245,10 +247,24 @@ class LauncherProvider with ChangeNotifier {
 
   /// Probes Docker availability via the system bridge and updates the
   /// reactive [isDockerAvailable] flag so the UI footer reflects real state.
+  /// Also checks for orphan containers left running from previous sessions to sync UI.
   Future<void> checkSystemDependencies() async {
     try {
       await _containerService.checkDockerStatus();
       _isDockerAvailable = true;
+
+      final result = await Process.run('docker', ['ps', '--format', '{{.Names}}']);
+      if (result.exitCode == 0) {
+        final names = result.stdout.toString();
+        if (names.contains('bootup_workspace_editor') || names.contains('bootup_node_workspace')) {
+          _states['web_kit'] = LauncherState.running;
+          _startMetricsStreaming('web_kit');
+        }
+        if (names.contains('bootup_python_notebook')) {
+          _states['python_sandbox'] = LauncherState.running;
+          _startMetricsStreaming('python_sandbox');
+        }
+      }
     } catch (_) {
       _isDockerAvailable = false;
     }
@@ -276,6 +292,11 @@ class LauncherProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  final Map<String, String> _mainContainers = {
+    'web_kit': 'bootup_node_workspace',
+    'python_sandbox': 'bootup_python_notebook',
+  };
+
   void _startMetricsStreaming(String stackId) {
     _metricsTimers[stackId]?.cancel();
     _metricsTimers[stackId] = Timer.periodic(const Duration(seconds: 3), (timer) async {
@@ -285,13 +306,14 @@ class LauncherProvider with ChangeNotifier {
         return;
       }
       try {
-        final process = await Process.run('docker', ['stats', '--no-stream', '--format', '{{.CPUPerc}}|{{.MemUsage}}']);
+        final containerName = _mainContainers[stackId] ?? 'bootup_node_workspace';
+        final process = await Process.run('docker', ['stats', containerName, '--no-stream', '--format', '{{.CPUPerc}}|{{.MemUsage}}']);
         if (process.exitCode == 0) {
           final output = process.stdout.toString().trim();
           final parts = output.split('|');
           if (parts.length >= 2) {
-            _liveCpu = parts[0];
-            _liveMemory = parts[1];
+            _cpuMetrics[stackId] = parts[0];
+            _memMetrics[stackId] = parts[1];
             notifyListeners();
           }
         }

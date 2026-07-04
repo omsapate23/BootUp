@@ -43,7 +43,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final launcher = context.watch<LauncherProvider>();
-    final isRunning = launcher.isRunning('web_kit');
 
     Widget rightContent;
     if (_selectedNavigationIndex == 0) {
@@ -127,8 +126,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       );
     } else if (_selectedNavigationIndex == 1) {
-      if (isRunning) {
-        rightContent = _buildActiveWorkspaceCanvas(context, 'web_kit');
+      final runningStackId = launcher.activeStacks.firstWhere((id) => launcher.isRunning(id), orElse: () => '');
+      if (runningStackId.isNotEmpty) {
+        rightContent = _buildActiveWorkspaceCanvas(context, runningStackId);
       } else {
         rightContent = Center(
           child: Column(
