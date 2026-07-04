@@ -662,7 +662,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 child: Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                    onTap: () => launcher.launchSystemBrowser('http://localhost:3000'),
+                                    onTap: () => launcher.launchSystemBrowser('http://localhost:8443'),
                                     borderRadius: BorderRadius.circular(8),
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

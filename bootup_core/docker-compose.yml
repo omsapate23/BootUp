@@ -68,6 +68,22 @@ services:
     networks:
       - bootup_network
 
+  # ----------------------------------------------------------------------------
+  # Workspace Editor Service: Provides in-browser VS Code editor (code-server)
+  # ----------------------------------------------------------------------------
+  workspace_editor:
+    image: codercom/code-server:latest
+    container_name: bootup_workspace_editor
+    ports:
+      - "8443:8443"
+    volumes:
+      - ./project_code:/home/coder/project
+    environment:
+      - CS_DISABLE_TELEMETRY=true
+    command: --auth none --bind-addr 0.0.0.0:8443 /home/coder/project
+    networks:
+      - bootup_network
+
 # ------------------------------------------------------------------------------
 # VOLUMES: Persistent storage scopes
 # ------------------------------------------------------------------------------
