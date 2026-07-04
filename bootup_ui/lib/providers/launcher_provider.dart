@@ -45,14 +45,20 @@ class LauncherProvider with ChangeNotifier {
   String getNetworkIo(String id) => isRunning(id) ? "12 KB / 8 KB" : "0 KB / 0 KB";
   String getDiskReadWrite(String id) => isRunning(id) ? "0 B / 4 KB" : "0 B / 0 B";
 
+  final Map<String, String> _blueprintPaths = {
+    'web_kit': '../bootup_core/blueprints/web_kit',
+    'python_sandbox': '../bootup_core/blueprints/python_sandbox',
+  };
+
   /// Traverses upward from the current directory to find the 'bootup_core' directory,
   /// falling back to a normalized absolute path to ensure robustness across platforms.
-  String _resolveCorePath() {
+  String _resolveCorePath(String id) {
+    final relativePath = _blueprintPaths[id] ?? '../bootup_core';
     var dir = Directory.current;
     while (true) {
       final candidate = Directory(p.join(dir.path, 'bootup_core'));
       if (candidate.existsSync()) {
-        return candidate.absolute.path;
+        return p.normalize(p.absolute(p.join(dir.path, relativePath.replaceAll('../', ''))));
       }
       final parent = dir.parent;
       if (parent.path == dir.path) {
@@ -60,10 +66,19 @@ class LauncherProvider with ChangeNotifier {
       }
       dir = parent;
     }
-    return Directory('../bootup_core').absolute.path;
+    return Directory(relativePath).absolute.path;
   }
 
   Future<void> bootUp(String stackId) async {
+    // Command injection guard check: restrict stack ID to strictly alphanumeric/underscores/dashes
+    final RegExp idRegex = RegExp(r'^[a-zA-Z0-9_-]+$');
+    if (!idRegex.hasMatch(stackId)) {
+      _states[stackId] = LauncherState.error;
+      _errorMessages[stackId] = 'Security Exception: Invalid characters in stack ID.';
+      notifyListeners();
+      return;
+    }
+
     // If a transaction lock is active, discard subsequent button triggers
     if (_isProcessing || getState(stackId) != LauncherState.inactive) {
       return;
@@ -89,7 +104,7 @@ class LauncherProvider with ChangeNotifier {
       }
 
       // 2. Resolve blueprint directories dynamically
-      final corePath = _resolveCorePath();
+      final corePath = _resolveCorePath(stackId);
 
       // 3. Initiate Docker Compose composition
       await _containerService.startStack(corePath);
@@ -117,6 +132,12 @@ class LauncherProvider with ChangeNotifier {
   }
 
   Future<void> shutDown(String stackId) async {
+    // Command injection guard check: restrict stack ID to strictly alphanumeric/underscores/dashes
+    final RegExp idRegex = RegExp(r'^[a-zA-Z0-9_-]+$');
+    if (!idRegex.hasMatch(stackId)) {
+      return;
+    }
+
     // If a transaction lock is active, discard subsequent triggers
     if (_isProcessing) {
       return;
@@ -146,7 +167,7 @@ class LauncherProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final corePath = _resolveCorePath();
+      final corePath = _resolveCorePath(stackId);
       await _containerService.stopStack(corePath);
 
       _states[stackId] = LauncherState.inactive;
@@ -220,7 +241,13 @@ class LauncherProvider with ChangeNotifier {
   }
 
   Stream<String> streamLogs(String stackId) {
-    final corePath = _resolveCorePath();
+    // Command injection guard check: restrict stack ID to strictly alphanumeric/underscores/dashes
+    final RegExp idRegex = RegExp(r'^[a-zA-Z0-9_-]+$');
+    if (!idRegex.hasMatch(stackId)) {
+      return const Stream.empty();
+    }
+
+    final corePath = _resolveCorePath(stackId);
     return _containerService.streamContainerLogs(corePath);
   }
 

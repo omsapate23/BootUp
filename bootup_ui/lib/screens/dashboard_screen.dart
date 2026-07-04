@@ -605,9 +605,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       ),
                                     ),
                                     const SizedBox(height: 24),
-                                    const Text(
-                                      'Full-Stack Developer Kit Running',
-                                      style: TextStyle(
+                                    Text(
+                                      stackId == 'web_kit'
+                                          ? 'MERN Stack Editor Workspace'
+                                          : 'Python Jupyter Analytics Hub',
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
@@ -615,7 +617,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      'Your web application workspace is ready.',
+                                      stackId == 'web_kit'
+                                          ? 'Your Node.js + MongoDB developer sandbox is active and running.'
+                                          : 'Your Jupyter Notebook data science environment is active and running.',
                                       style: TextStyle(
                                         color: Colors.white.withOpacity(0.6),
                                         fontSize: 14,
@@ -662,7 +666,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 child: Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                    onTap: () => launcher.launchSystemBrowser('http://localhost:8443'),
+                                    onTap: () => launcher.launchSystemBrowser(
+                                      stackId == 'web_kit'
+                                          ? 'http://localhost:8443'
+                                          : 'http://localhost:8888',
+                                    ),
                                     borderRadius: BorderRadius.circular(8),
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
