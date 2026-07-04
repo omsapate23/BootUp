@@ -317,3 +317,39 @@ ProcessException: The system cannot find the file specified (at ../../../flutter
 
 [2026-07-04T01:33:41.164205] Stack startup completed successfully for: D:\BootUp\bootup_core
 
+[2026-07-04T12:17:07.996401] Running Docker daemon health check...
+
+[2026-07-04T12:17:08.382247] Docker daemon health check passed.
+
+[2026-07-04T12:17:27.398983] Running Docker daemon health check...
+
+[2026-07-04T12:17:27.741135] Docker daemon health check passed.
+
+[2026-07-04T12:17:27.744912] Starting Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-04T12:17:28.192355] Stack startup completed successfully for: D:\BootUp\bootup_core
+
+[2026-07-04T12:17:47.921645] Stopping Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-04T12:17:50.741047] Stack teardown completed successfully for: D:\BootUp\bootup_core
+
+[2026-07-04T12:20:38.976726] Running Docker daemon health check...
+
+[2026-07-04T12:20:39.387046] Docker daemon health check passed.
+
+[2026-07-04T12:20:39.390047] Starting Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-04T12:20:40.826521] Stack startup completed successfully for: D:\BootUp\bootup_core
+
+[2026-07-04T12:30:25.385109] Running Docker daemon health check...
+
+[2026-07-04T12:30:25.760765] Docker daemon health check passed.
+
+[2026-07-04T12:30:29.942984] Running Docker daemon health check...
+
+[2026-07-04T12:30:30.224911] Docker daemon health check passed.
+
+[2026-07-04T12:30:30.229476] Starting Docker stack composition: D:\BootUp\bootup_core
+
+[2026-07-04T12:30:30.580038] Stack startup completed successfully for: D:\BootUp\bootup_core
+
