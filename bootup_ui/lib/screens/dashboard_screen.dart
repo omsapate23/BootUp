@@ -13,6 +13,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
   int _selectedNavigationIndex = 0;
+  bool _isExiting = false;
 
   @override
   void initState() {
@@ -44,6 +45,49 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
+    if (_isExiting) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(brightness: Brightness.dark),
+        home: Scaffold(
+          backgroundColor: const Color(0xFF141414),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: CircularProgressIndicator(
+                    color: Color(0xFF007BFF),
+                    strokeWidth: 4,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Shutting down sandboxes safely...',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Cleaning up container networks and persistent volumes',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.4),
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     final launcher = context.watch<LauncherProvider>();
 
     Widget rightContent;
@@ -740,29 +784,11 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
 
   @override
   void onWindowClose() async {
-    bool isPreventClose = await windowManager.isPreventClose();
-    if (isPreventClose) {
-      if (!mounted) return;
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return const AlertDialog(
-            backgroundColor: Color(0xFF262626),
-            content: Row(
-              children: [
-                CircularProgressIndicator(color: Color(0xFF007BFF)),
-                SizedBox(width: 20),
-                Text(
-                  'Shutting down sandboxes safely...',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-
+    final isPrevent = await windowManager.isPreventClose();
+    if (isPrevent) {
+      setState(() {
+        _isExiting = true;
+      });
       await Provider.of<LauncherProvider>(context, listen: false).shutdownAllActiveStacks();
       await windowManager.destroy();
     }

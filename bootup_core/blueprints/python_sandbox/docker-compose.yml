@@ -5,9 +5,9 @@ services:
     image: jupyter/datascience-notebook:latest
     container_name: bootup_python_notebook
     ports:
-      - "127.0.0.1:8888:8888"
+      - "127.0.0.1:${PORT:-8888}:8888"
     volumes:
-      - ./notebooks:/home/jovyan/work
+      - ./notebooks/workspace:/home/jovyan/work
     environment:
       - JUPYTER_TOKEN=none # Disables token onboarding screen for simplified student usage
     networks:
@@ -19,7 +19,7 @@ services:
     ports:
       - "127.0.0.1:8443:8443"
     volumes:
-      - ./notebooks:/home/coder/project
+      - ./notebooks/workspace:/home/coder/project
     environment:
       - CS_DISABLE_TELEMETRY=true
       - AUTH=none

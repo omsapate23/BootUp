@@ -111,7 +111,7 @@ $stderr
 
   /// Spins up a docker-compose environment in the targeted folder.
   /// Intercepts and parses stderr for port conflict errors (e.g. ports 3000 or 27017).
-  Future<void> startStack(String stackPath) async {
+  Future<void> startStack(String stackPath, {Map<String, String>? environment}) async {
     final absoluteStackPath = p.absolute(p.normalize(stackPath));
     _logEvent('Starting Docker stack composition: $absoluteStackPath');
 
@@ -120,6 +120,7 @@ $stderr
         'docker',
         ['compose', 'up', '-d'],
         workingDirectory: absoluteStackPath,
+        environment: environment,
       );
 
       final stderrBuffer = StringBuffer();

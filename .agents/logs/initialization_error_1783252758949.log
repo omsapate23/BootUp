@@ -1,0 +1,21 @@
+Timestamp: 2026-07-05T17:29:18.949274
+Command: docker compose up -d
+Working Directory: D:\BootUp\bootup_core\blueprints\python_sandbox
+Exit Code: 1
+
+=== STDOUT ===
+
+
+=== STDERR ===
+time="2026-07-05T17:29:18+05:30" level=warning msg="D:\\BootUp\\bootup_core\\blueprints\\python_sandbox\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Network python_sandbox_bootup_network Creating 
+ Network python_sandbox_bootup_network Created 
+ Container bootup_python_editor Creating 
+ Container bootup_python_notebook Creating 
+ Container bootup_python_notebook Created 
+ Container bootup_python_editor Created 
+ Container bootup_python_editor Starting 
+ Container bootup_python_notebook Starting 
+ Container bootup_python_notebook Started 
+Error response from daemon: failed to set up container networking: driver failed programming external connectivity on endpoint bootup_python_editor (f9932f943352eb795a1373e0f5304d521ea6078ba25094936a544e4c5127c0f7): Bind for 127.0.0.1:8443 failed: port is already allocated
+

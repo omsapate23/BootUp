@@ -79,7 +79,29 @@ class LauncherProvider with ChangeNotifier {
     return p.join(Directory.current.path, 'stack_configs.json');
   }
 
-  String getStackPort(String id) => _stackConfigs[id]?['port'] ?? _stackPorts[id] ?? '3000';
+  final Map<String, int> _assignedPorts = {};
+
+  int getAssignedPort(String id, int defaultPort) {
+    if (_assignedPorts.containsKey(id)) return _assignedPorts[id]!;
+    int port = defaultPort;
+    while (_assignedPorts.containsValue(port)) {
+      port++;
+    }
+    _assignedPorts[id] = port;
+    return port;
+  }
+
+  String getStackPort(String id) {
+    final configPort = _stackConfigs[id]?['port'];
+    if (configPort != null && configPort.toString().isNotEmpty) {
+      final intPort = int.tryParse(configPort.toString());
+      if (intPort != null) {
+        return getAssignedPort(id, intPort).toString();
+      }
+    }
+    final int defaultPort = id == 'web_kit' ? 3000 : 8888;
+    return getAssignedPort(id, defaultPort).toString();
+  }
 
   // Transaction protection lock state to prevent button flooding / race conditions
   bool _isProcessing = false;
@@ -169,8 +191,38 @@ class LauncherProvider with ChangeNotifier {
       // 2. Resolve blueprint directories dynamically
       final corePath = _resolveCorePath(stackId);
 
+      // Create workspace folders with correct permissions before startup
+      final workspacePath = stackId == 'web_kit' ? 'project_code/workspace' : 'notebooks/workspace';
+      final workspaceDir = Directory(p.join(corePath, workspacePath));
+      if (!workspaceDir.existsSync()) {
+        workspaceDir.createSync(recursive: true);
+      }
+      
+      final literalWorkspaceDir = Directory(p.join(corePath, 'workspace'));
+      if (!literalWorkspaceDir.existsSync()) {
+        literalWorkspaceDir.createSync(recursive: true);
+      }
+
+      final assignedPortStr = getStackPort(stackId);
+
       // 3. Initiate Docker Compose composition
-      await _containerService.startStack(corePath);
+      await _containerService.startStack(corePath, environment: {
+        'PORT': assignedPortStr,
+      });
+
+      // Create START.md onboarding file
+      final file1 = File(p.join(workspaceDir.path, 'START.md'));
+      final file2 = File(p.join(literalWorkspaceDir.path, 'START.md'));
+      final content = stackId == 'web_kit'
+          ? "### 🚀 Welcome to your Full-Stack Sandbox Workspace!\nTo run your active application preview window, write your HTML/JS code here, and tap the 'Open Application Preview' button on your BootUp terminal bar dashboard window panel."
+          : "### 🐍 Welcome to your Python Jupyter Analytics Workspace!\nCreate a fresh `.ipynb` file cell framework to launch predictive modeling code arrays natively inside your sandbox environment loop.";
+      
+      if (!file1.existsSync()) {
+        file1.writeAsStringSync(content);
+      }
+      if (!file2.existsSync()) {
+        file2.writeAsStringSync(content);
+      }
 
       _states[stackId] = LauncherState.running;
       _startMetricsStreaming(stackId);

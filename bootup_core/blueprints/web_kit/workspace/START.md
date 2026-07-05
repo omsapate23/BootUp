@@ -1,0 +1,2 @@
+### 🚀 Welcome to your Full-Stack Sandbox Workspace!
+To run your active application preview window, write your HTML/JS code here, and tap the 'Open Application Preview' button on your BootUp terminal bar dashboard window panel.
