@@ -118,7 +118,7 @@ $stderr
     try {
       final process = await Process.start(
         'docker',
-        ['compose', 'up', '-d'],
+        ['compose', 'up', '-d', '--force-recreate'],
         workingDirectory: absoluteStackPath,
         environment: environment,
       );

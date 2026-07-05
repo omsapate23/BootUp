@@ -523,7 +523,8 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
 
   Widget _buildActiveWorkspaceCanvas(BuildContext context, String stackId) {
     final launcher = Provider.of<LauncherProvider>(context);
-    final port = launcher.getStackPort(stackId);
+    final dynamicPort = launcher.getAssignedPort(stackId);
+    final appUrl = 'http://localhost:$dynamicPort';
     
     return Container(
       color: const Color(0xFF1A1A1A),
@@ -575,7 +576,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
                         const Icon(Icons.lock, color: Colors.greenAccent, size: 14),
                         const SizedBox(width: 10),
                         Text(
-                          'http://localhost:$port',
+                          appUrl,
                           style: const TextStyle(
                             color: Colors.white60,
                             fontSize: 13,
@@ -588,7 +589,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
                           color: Colors.transparent,
                           child: InkWell(
                             onTap: () {
-                              launcher.launchSystemBrowser('http://localhost:$port');
+                              launcher.launchSystemBrowser(appUrl);
                             },
                             borderRadius: BorderRadius.circular(4),
                             child: const Padding(
@@ -779,7 +780,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
                                     Material(
                                       color: Colors.transparent,
                                       child: InkWell(
-                                        onTap: () => launcher.launchSystemBrowser('http://localhost:$port'),
+                                        onTap: () => launcher.launchSystemBrowser(appUrl),
                                         borderRadius: BorderRadius.circular(8),
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

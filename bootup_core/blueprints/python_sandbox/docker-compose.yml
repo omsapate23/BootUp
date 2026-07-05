@@ -14,9 +14,9 @@ services:
       - /bin/sh
       - -c
       - |
-        mkdir -p /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/apputils-extension
-        echo '{"theme": "JupyterLab Dark"}' > /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/themes.json
-        exec start-notebook.sh --NotebookApp.token=""
+        mkdir -p /opt/conda/share/jupyter/lab/settings
+        echo '{"theme": "JupyterLab Dark"}' > /opt/conda/share/jupyter/lab/settings/page_config.json
+        exec start-notebook.sh --NotebookApp.token="" --NotebookApp.password="" --ip=127.0.0.1
     networks:
       - bootup_network
 
