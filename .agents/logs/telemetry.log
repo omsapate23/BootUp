@@ -670,3 +670,35 @@ Error response from daemon: failed to set up container networking: driver failed
 
 [2026-07-05T18:01:51.291369] Stack startup completed successfully for: D:\BootUp\bootup_core\blueprints\python_sandbox
 
+[2026-07-05T18:11:42.655892] Running Docker daemon health check...
+
+[2026-07-05T18:11:43.057817] Docker daemon health check passed.
+
+[2026-07-05T18:13:37.976672] Running Docker daemon health check...
+
+[2026-07-05T18:13:38.421963] Docker daemon health check passed.
+
+[2026-07-05T18:14:02.146705] Stopping Docker stack composition: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T18:14:04.072940] Stack teardown completed successfully for: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T18:14:04.549828] Stopping Docker stack composition: D:\BootUp\bootup_core\blueprints\python_sandbox
+
+[2026-07-05T18:14:05.948879] Stack teardown completed successfully for: D:\BootUp\bootup_core\blueprints\python_sandbox
+
+[2026-07-05T18:14:06.381527] Running Docker daemon health check...
+
+[2026-07-05T18:14:06.695747] Docker daemon health check passed.
+
+[2026-07-05T18:14:06.707724] Starting Docker stack composition: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T18:14:07.982959] Stack startup completed successfully for: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T18:14:10.849546] Running Docker daemon health check...
+
+[2026-07-05T18:14:11.180496] Docker daemon health check passed.
+
+[2026-07-05T18:14:11.185001] Starting Docker stack composition: D:\BootUp\bootup_core\blueprints\python_sandbox
+
+[2026-07-05T18:14:12.106693] Stack startup completed successfully for: D:\BootUp\bootup_core\blueprints\python_sandbox
+

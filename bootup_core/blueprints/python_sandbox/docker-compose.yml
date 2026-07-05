@@ -5,11 +5,18 @@ services:
     image: jupyter/datascience-notebook:latest
     container_name: bootup_python_notebook
     ports:
-      - "127.0.0.1:${APP_PORT}:8888"
+      - "${APP_PORT}:8888"
     volumes:
       - ./notebooks/workspace:/home/jovyan/work
     environment:
-      - JUPYTER_TOKEN=none # Disables token onboarding screen for simplified student usage
+      - JUPYTER_TOKEN=none
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        mkdir -p /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/apputils-extension
+        echo '{"theme": "JupyterLab Dark"}' > /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/themes.json
+        exec start-notebook.sh --NotebookApp.token=""
     networks:
       - bootup_network
 
@@ -17,7 +24,7 @@ services:
     image: codercom/code-server:latest
     container_name: bootup_python_editor
     ports:
-      - "127.0.0.1:${IDE_PORT}:8443"
+      - "${IDE_PORT}:8443"
     volumes:
       - ./notebooks/workspace:/home/coder/project
     environment:
