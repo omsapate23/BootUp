@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:window_manager/window_manager.dart';
 import '../providers/launcher_provider.dart';
 import '../widgets/stack_card.dart';
 
@@ -10,12 +11,13 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
   int _selectedNavigationIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    windowManager.addListener(this);
     // Probe Docker availability immediately on launch so the footer is accurate
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<LauncherProvider>(context, listen: false).checkSystemDependencies();
@@ -126,9 +128,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       );
     } else if (_selectedNavigationIndex == 1) {
-      final runningStackId = launcher.activeStacks.firstWhere((id) => launcher.isRunning(id), orElse: () => '');
-      if (runningStackId.isNotEmpty) {
-        rightContent = _buildActiveWorkspaceCanvas(context, runningStackId);
+      final activeStackId = launcher.states.keys.firstWhere(
+        (id) => launcher.isRunning(id),
+        orElse: () => '',
+      );
+      if (activeStackId.isNotEmpty) {
+        rightContent = _buildActiveWorkspaceCanvas(context, activeStackId);
       } else {
         rightContent = Center(
           child: Column(
@@ -657,33 +662,59 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               Positioned(
                                 top: 20,
                                 right: 20,
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () => launcher.launchSystemBrowser(
-                                      stackId == 'web_kit'
-                                          ? 'http://localhost:8443'
-                                          : 'http://localhost:8888',
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF007BFF).withOpacity(0.2),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () => launcher.launchSystemBrowser('http://localhost:$port'),
                                         borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: const Color(0xFF007BFF).withOpacity(0.3)),
-                                      ),
-                                      child: const Text(
-                                        'LIVE WORKSPACE',
-                                        style: TextStyle(
-                                          color: Color(0xFF007BFF),
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 0.5,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF007BFF).withOpacity(0.2),
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(color: const Color(0xFF007BFF).withOpacity(0.3)),
+                                          ),
+                                          child: const Text(
+                                            'APPLICATION PREVIEW',
+                                            style: TextStyle(
+                                              color: Color(0xFF007BFF),
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 0.5,
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
+                                    const SizedBox(width: 12),
+                                    Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () => launcher.launchSystemBrowser('http://localhost:8443'),
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: Colors.tealAccent.withOpacity(0.15),
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(color: Colors.tealAccent.withOpacity(0.3)),
+                                          ),
+                                          child: const Text(
+                                            'IDE CODE EDITOR',
+                                            style: TextStyle(
+                                              color: Colors.tealAccent,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 0.5,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
@@ -699,5 +730,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    windowManager.removeListener(this);
+    super.dispose();
+  }
+
+  @override
+  void onWindowClose() async {
+    bool isPreventClose = await windowManager.isPreventClose();
+    if (isPreventClose) {
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return const AlertDialog(
+            backgroundColor: Color(0xFF262626),
+            content: Row(
+              children: [
+                CircularProgressIndicator(color: Color(0xFF007BFF)),
+                SizedBox(width: 20),
+                Text(
+                  'Shutting down sandboxes safely...',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+
+      await Provider.of<LauncherProvider>(context, listen: false).shutdownAllActiveStacks();
+      await windowManager.destroy();
+    }
   }
 }

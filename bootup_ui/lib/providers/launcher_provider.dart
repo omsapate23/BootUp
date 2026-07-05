@@ -93,6 +93,8 @@ class LauncherProvider with ChangeNotifier {
 
   List<String> get activeStacks => _stackConfigs.keys.toList();
 
+  Map<String, LauncherState> get states => _states;
+
   LauncherState getState(String stackId) => _states[stackId] ?? LauncherState.inactive;
   String getErrorMessage(String stackId) => _errorMessages[stackId] ?? '';
 
@@ -330,6 +332,25 @@ class LauncherProvider with ChangeNotifier {
 
     final corePath = _resolveCorePath(stackId);
     return _containerService.streamContainerLogs(corePath);
+  }
+
+  Future<void> shutdownAllActiveStacks() async {
+    final runningIds = _states.keys.where((id) => isRunning(id)).toList();
+    for (final id in runningIds) {
+      try {
+        _states[id] = LauncherState.booting;
+        notifyListeners();
+        final corePath = _resolveCorePath(id);
+        await _containerService.stopStack(corePath);
+        _states[id] = LauncherState.inactive;
+        _errorMessages[id] = '';
+        notifyListeners();
+      } catch (e) {
+        _states[id] = LauncherState.error;
+        _errorMessages[id] = 'Failed to stop: ${e.toString().replaceAll('Exception: ', '')}';
+        notifyListeners();
+      }
+    }
   }
 
   @override

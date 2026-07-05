@@ -439,3 +439,141 @@ ProcessException: The system cannot find the file specified (at ../../../flutter
 
 [2026-07-04T14:44:26.136763] Stack startup completed successfully for: D:\BootUp\bootup_core\blueprints\web_kit
 
+[2026-07-05T13:16:39.724266] Running Docker daemon health check...
+
+[2026-07-05T13:16:40.279261] Docker daemon health check passed.
+
+[2026-07-05T13:17:04.876089] Stopping Docker stack composition: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T13:17:07.218158] Stack teardown completed successfully for: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T13:17:08.605079] Stopping Docker stack composition: D:\BootUp\bootup_core\blueprints\python_sandbox
+
+[2026-07-05T13:17:10.229639] Stack teardown completed successfully for: D:\BootUp\bootup_core\blueprints\python_sandbox
+
+[2026-07-05T13:20:59.232987] Running Docker daemon health check...
+
+[2026-07-05T13:20:59.604163] Docker daemon health check passed.
+
+[2026-07-05T13:20:59.607166] Starting Docker stack composition: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T13:21:00.984007] Stack startup completed successfully for: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T13:53:23.952082] Running Docker daemon health check...
+
+[2026-07-05T13:53:27.367211] Docker daemon health check passed.
+
+[2026-07-05T13:54:45.674713] Running Docker daemon health check...
+
+[2026-07-05T13:54:46.068730] Docker daemon health check passed.
+
+[2026-07-05T13:55:39.721178] Stopping Docker stack composition: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T13:55:41.804297] Stack teardown completed successfully for: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T13:55:42.789557] Running Docker daemon health check...
+
+[2026-07-05T13:55:43.148666] Docker daemon health check passed.
+
+[2026-07-05T13:55:43.152675] Starting Docker stack composition: D:\BootUp\bootup_core\blueprints\python_sandbox
+
+[2026-07-05T13:55:44.190950] Stack startup completed successfully for: D:\BootUp\bootup_core\blueprints\python_sandbox
+
+[2026-07-05T13:56:05.267145] Running Docker daemon health check...
+
+[2026-07-05T13:56:05.582863] Docker daemon health check passed.
+
+[2026-07-05T13:56:05.586414] Starting Docker stack composition: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T13:56:06.859766] Stack startup failed for: D:\BootUp\bootup_core\blueprints\web_kit
+Details:
+time="2026-07-05T13:56:05+05:30" level=warning msg="D:\\BootUp\\bootup_core\\blueprints\\web_kit\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Network web_kit_bootup_network Creating 
+ Network web_kit_bootup_network Created 
+ Container bootup_workspace_editor Creating 
+ Container bootup_mongodb Creating 
+ Container bootup_workspace_editor Created 
+ Container bootup_mongodb Created 
+ Container bootup_node_workspace Creating 
+ Container bootup_node_workspace Created 
+ Container bootup_workspace_editor Starting 
+ Container bootup_mongodb Starting 
+ Container bootup_mongodb Started 
+ Container bootup_node_workspace Starting 
+ Container bootup_node_workspace Started 
+Error response from daemon: failed to set up container networking: driver failed programming external connectivity on endpoint bootup_workspace_editor (916e12e6772a25a3a9f486af5706fdfc682efeb92498382cd4f54337b275c298): Bind for 127.0.0.1:8443 failed: port is already allocated
+
+
+[2026-07-05T13:56:20.752373] Stopping Docker stack composition: D:\BootUp\bootup_core\blueprints\python_sandbox
+
+[2026-07-05T13:56:22.767121] Stack teardown completed successfully for: D:\BootUp\bootup_core\blueprints\python_sandbox
+
+[2026-07-05T13:56:23.482608] Stopping Docker stack composition: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T13:56:25.408579] Stack teardown completed successfully for: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T13:56:26.308942] Running Docker daemon health check...
+
+[2026-07-05T13:56:26.650186] Docker daemon health check passed.
+
+[2026-07-05T13:56:26.653186] Starting Docker stack composition: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T13:56:27.868362] Stack startup completed successfully for: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T13:57:28.748137] Running Docker daemon health check...
+
+[2026-07-05T13:57:29.085247] Docker daemon health check passed.
+
+[2026-07-05T13:57:29.088251] Starting Docker stack composition: D:\BootUp\bootup_core\blueprints\python_sandbox
+
+[2026-07-05T13:57:30.021296] Stack startup failed for: D:\BootUp\bootup_core\blueprints\python_sandbox
+Details:
+time="2026-07-05T13:57:29+05:30" level=warning msg="D:\\BootUp\\bootup_core\\blueprints\\python_sandbox\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Network python_sandbox_bootup_network Creating 
+ Network python_sandbox_bootup_network Created 
+ Container bootup_python_editor Creating 
+ Container bootup_python_notebook Creating 
+ Container bootup_python_editor Created 
+ Container bootup_python_notebook Created 
+ Container bootup_python_editor Starting 
+ Container bootup_python_notebook Starting 
+ Container bootup_python_notebook Started 
+Error response from daemon: failed to set up container networking: driver failed programming external connectivity on endpoint bootup_python_editor (c38ecf3d47d3975293f3d26dd23c34709ba2326349377eebf45dfa8fe585cffc): Bind for 127.0.0.1:8443 failed: port is already allocated
+
+
+[2026-07-05T13:57:42.981565] Stopping Docker stack composition: D:\BootUp\bootup_core\blueprints\python_sandbox
+
+[2026-07-05T13:57:44.168500] Stack teardown completed successfully for: D:\BootUp\bootup_core\blueprints\python_sandbox
+
+[2026-07-05T13:57:45.118369] Stopping Docker stack composition: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T13:57:47.332358] Stack teardown completed successfully for: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T13:57:47.994057] Running Docker daemon health check...
+
+[2026-07-05T13:57:48.305355] Docker daemon health check passed.
+
+[2026-07-05T13:57:48.306382] Starting Docker stack composition: D:\BootUp\bootup_core\blueprints\python_sandbox
+
+[2026-07-05T13:57:49.285244] Stack startup completed successfully for: D:\BootUp\bootup_core\blueprints\python_sandbox
+
+[2026-07-05T13:58:31.570193] Stopping Docker stack composition: D:\BootUp\bootup_core\blueprints\python_sandbox
+
+[2026-07-05T13:58:33.587160] Stack teardown completed successfully for: D:\BootUp\bootup_core\blueprints\python_sandbox
+
+[2026-07-05T13:59:25.680934] Running Docker daemon health check...
+
+[2026-07-05T13:59:26.048307] Docker daemon health check passed.
+
+[2026-07-05T13:59:30.736341] Running Docker daemon health check...
+
+[2026-07-05T13:59:31.070361] Docker daemon health check passed.
+
+[2026-07-05T13:59:31.073411] Starting Docker stack composition: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T13:59:32.195476] Stack startup completed successfully for: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T13:59:46.464282] Stopping Docker stack composition: D:\BootUp\bootup_core\blueprints\web_kit
+
+[2026-07-05T13:59:48.548491] Stack teardown completed successfully for: D:\BootUp\bootup_core\blueprints\web_kit
+

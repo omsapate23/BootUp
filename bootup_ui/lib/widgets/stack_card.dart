@@ -535,30 +535,62 @@ class _StackCardState extends State<StackCard> with SingleTickerProviderStateMix
                     ),
                   // Optional secondary action: Open Workspace (only when running)
                   if (launcher.isRunning(widget.id)) ...[
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF007BFF),
-                          side: const BorderSide(color: Color(0xFF007BFF), width: 1.5),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: SizedBox(
+                            height: 50,
+                            child: OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFF007BFF),
+                                side: const BorderSide(color: Color(0xFF007BFF), width: 1.5),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              onPressed: () {
+                                launcher.launchSystemBrowser('http://localhost:${launcher.getStackPort(widget.id)}');
+                              },
+                              icon: const Icon(Icons.play_circle_outline, size: 18),
+                              label: const Text(
+                                'APPLICATION PREVIEW',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                        onPressed: () {
-                          launcher.launchSystemBrowser('http://localhost:${launcher.getStackPort(widget.id)}');
-                        },
-                        icon: const Icon(Icons.open_in_new, size: 18),
-                        label: const Text(
-                          'OPEN WORKSPACE',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: SizedBox(
+                            height: 50,
+                            child: OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.tealAccent,
+                                side: const BorderSide(color: Colors.tealAccent, width: 1.5),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              onPressed: () {
+                                launcher.launchSystemBrowser('http://localhost:8443');
+                              },
+                              icon: const Icon(Icons.code_rounded, size: 18),
+                              label: const Text(
+                                'IDE CODE EDITOR',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
                     const SizedBox(height: 12),
                   ],

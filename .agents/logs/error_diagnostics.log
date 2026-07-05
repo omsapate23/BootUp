@@ -1,0 +1,50 @@
+========================================
+Timestamp: 2026-07-05T13:56:06.862763
+Command: docker compose up -d
+Working Directory: D:\BootUp\bootup_core\blueprints\web_kit
+Exit Code: 1
+
+=== STDOUT ===
+
+
+=== STDERR ===
+time="2026-07-05T13:56:05+05:30" level=warning msg="D:\\BootUp\\bootup_core\\blueprints\\web_kit\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Network web_kit_bootup_network Creating 
+ Network web_kit_bootup_network Created 
+ Container bootup_workspace_editor Creating 
+ Container bootup_mongodb Creating 
+ Container bootup_workspace_editor Created 
+ Container bootup_mongodb Created 
+ Container bootup_node_workspace Creating 
+ Container bootup_node_workspace Created 
+ Container bootup_workspace_editor Starting 
+ Container bootup_mongodb Starting 
+ Container bootup_mongodb Started 
+ Container bootup_node_workspace Starting 
+ Container bootup_node_workspace Started 
+Error response from daemon: failed to set up container networking: driver failed programming external connectivity on endpoint bootup_workspace_editor (916e12e6772a25a3a9f486af5706fdfc682efeb92498382cd4f54337b275c298): Bind for 127.0.0.1:8443 failed: port is already allocated
+
+
+========================================
+Timestamp: 2026-07-05T13:57:30.024178
+Command: docker compose up -d
+Working Directory: D:\BootUp\bootup_core\blueprints\python_sandbox
+Exit Code: 1
+
+=== STDOUT ===
+
+
+=== STDERR ===
+time="2026-07-05T13:57:29+05:30" level=warning msg="D:\\BootUp\\bootup_core\\blueprints\\python_sandbox\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Network python_sandbox_bootup_network Creating 
+ Network python_sandbox_bootup_network Created 
+ Container bootup_python_editor Creating 
+ Container bootup_python_notebook Creating 
+ Container bootup_python_editor Created 
+ Container bootup_python_notebook Created 
+ Container bootup_python_editor Starting 
+ Container bootup_python_notebook Starting 
+ Container bootup_python_notebook Started 
+Error response from daemon: failed to set up container networking: driver failed programming external connectivity on endpoint bootup_python_editor (c38ecf3d47d3975293f3d26dd23c34709ba2326349377eebf45dfa8fe585cffc): Bind for 127.0.0.1:8443 failed: port is already allocated
+
+
