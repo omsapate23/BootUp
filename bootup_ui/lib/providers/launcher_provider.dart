@@ -96,15 +96,19 @@ class LauncherProvider with ChangeNotifier {
   int getAppPort(String id) => _runtimePorts[id]?['app'] ?? (id == 'web_kit' ? 3000 : 8888);
   int getIdePort(String id) => _runtimePorts[id]?['ide'] ?? 8443;
 
-  String getStackPort(String id) {
+  int getAssignedPort(String id) {
     final configPort = _stackConfigs[id]?['port'];
     if (configPort != null && configPort.toString().isNotEmpty) {
       final intPort = int.tryParse(configPort.toString());
       if (intPort != null) {
-        return intPort.toString();
+        return intPort;
       }
     }
-    return getAppPort(id).toString();
+    return getAppPort(id);
+  }
+
+  String getStackPort(String id) {
+    return getAssignedPort(id).toString();
   }
 
   String getIdePortStr(String id) {

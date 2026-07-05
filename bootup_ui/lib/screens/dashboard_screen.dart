@@ -14,6 +14,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
   int _selectedNavigationIndex = 0;
   bool _isExiting = false;
+  String? _focusedActiveStackId;
 
   @override
   void initState() {
@@ -172,12 +173,78 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
         ),
       );
     } else if (_selectedNavigationIndex == 1) {
-      final activeStackId = launcher.states.keys.firstWhere(
-        (id) => launcher.isRunning(id),
-        orElse: () => '',
-      );
-      if (activeStackId.isNotEmpty) {
-        rightContent = _buildActiveWorkspaceCanvas(context, activeStackId);
+      final runningStacks = launcher.states.keys.where((id) => launcher.isRunning(id)).toList();
+      if (runningStacks.isNotEmpty) {
+        if (_focusedActiveStackId == null || !runningStacks.contains(_focusedActiveStackId)) {
+          _focusedActiveStackId = runningStacks.first;
+        }
+        
+        if (runningStacks.length == 1) {
+          rightContent = _buildActiveWorkspaceCanvas(context, _focusedActiveStackId!);
+        } else {
+          rightContent = Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Smooth row of tab chips
+              Container(
+                color: const Color(0xFF1A1A1F),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: Row(
+                  children: runningStacks.map((id) {
+                    final isSelected = id == _focusedActiveStackId;
+                    final config = launcher.getStackConfig(id);
+                    final displayName = config['name'] ?? (id == 'web_kit' ? 'Web Kit' : 'Python Sandbox');
+                    
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 12.0),
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            _focusedActiveStackId = id;
+                          });
+                        },
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected ? const Color(0xFF007BFF) : const Color(0xFF222222),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: isSelected ? const Color(0xFF007BFF) : Colors.white.withOpacity(0.1),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                id == 'web_kit' ? Icons.code : Icons.analytics_outlined,
+                                size: 16,
+                                color: isSelected ? Colors.white : Colors.white54,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                displayName,
+                                style: TextStyle(
+                                  color: isSelected ? Colors.white : Colors.white70,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              Expanded(
+                child: _buildActiveWorkspaceCanvas(context, _focusedActiveStackId!),
+              ),
+            ],
+          );
+        }
       } else {
         rightContent = Center(
           child: Column(
