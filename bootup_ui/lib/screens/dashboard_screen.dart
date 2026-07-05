@@ -523,8 +523,10 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
 
   Widget _buildActiveWorkspaceCanvas(BuildContext context, String stackId) {
     final launcher = Provider.of<LauncherProvider>(context);
-    final dynamicPort = launcher.getAssignedPort(stackId);
-    final appUrl = 'http://localhost:$dynamicPort';
+    final appPort = launcher.getAssignedPort(stackId);
+    final idePort = launcher.getIdePort(stackId);
+    final appUrl = 'http://localhost:$appPort';
+    final ideUrl = 'http://localhost:$idePort';
     
     return Container(
       color: const Color(0xFF1A1A1A),
@@ -805,7 +807,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
                                     Material(
                                       color: Colors.transparent,
                                       child: InkWell(
-                                        onTap: () => launcher.launchSystemBrowser('http://localhost:${launcher.getIdePortStr(stackId)}'),
+                                        onTap: () => launcher.launchSystemBrowser(ideUrl),
                                         borderRadius: BorderRadius.circular(8),
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

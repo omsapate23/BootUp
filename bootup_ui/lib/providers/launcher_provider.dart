@@ -332,6 +332,15 @@ class LauncherProvider with ChangeNotifier {
       await _containerService.checkDockerStatus();
       _isDockerAvailable = true;
 
+      // Clean-slate startup initialization to purge ghost containers
+      for (var id in _blueprintPaths.keys) {
+        final resolvedPath = _resolveCorePath(id);
+        await Process.run('docker', ['compose', 'down'], workingDirectory: resolvedPath);
+      }
+      _states.clear();
+      _runtimePorts.clear();
+      notifyListeners();
+
       final result = await Process.run('docker', ['ps', '--format', '{{.Names}}']);
       if (result.exitCode == 0) {
         final names = result.stdout.toString();
