@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:bootup_bridge/bootup_bridge.dart';
 import 'package:path/path.dart' as p;
@@ -79,28 +80,35 @@ class LauncherProvider with ChangeNotifier {
     return p.join(Directory.current.path, 'stack_configs.json');
   }
 
-  final Map<String, int> _assignedPorts = {};
+  final Map<String, Map<String, int>> _runtimePorts = {};
 
-  int getAssignedPort(String id, int defaultPort) {
-    if (_assignedPorts.containsKey(id)) return _assignedPorts[id]!;
-    int port = defaultPort;
-    while (_assignedPorts.containsValue(port)) {
-      port++;
+  Future<int> findAvailableHostPort() async {
+    try {
+      final socket = await ServerSocket.bind(InternetAddress.loopbackIPv4, 0);
+      final int freePort = socket.port;
+      await socket.close();
+      return freePort;
+    } catch (_) {
+      return 3000 + Random().nextInt(1000);
     }
-    _assignedPorts[id] = port;
-    return port;
   }
+
+  int getAppPort(String id) => _runtimePorts[id]?['app'] ?? (id == 'web_kit' ? 3000 : 8888);
+  int getIdePort(String id) => _runtimePorts[id]?['ide'] ?? 8443;
 
   String getStackPort(String id) {
     final configPort = _stackConfigs[id]?['port'];
     if (configPort != null && configPort.toString().isNotEmpty) {
       final intPort = int.tryParse(configPort.toString());
       if (intPort != null) {
-        return getAssignedPort(id, intPort).toString();
+        return intPort.toString();
       }
     }
-    final int defaultPort = id == 'web_kit' ? 3000 : 8888;
-    return getAssignedPort(id, defaultPort).toString();
+    return getAppPort(id).toString();
+  }
+
+  String getIdePortStr(String id) {
+    return getIdePort(id).toString();
   }
 
   // Transaction protection lock state to prevent button flooding / race conditions
@@ -203,11 +211,24 @@ class LauncherProvider with ChangeNotifier {
         literalWorkspaceDir.createSync(recursive: true);
       }
 
-      final assignedPortStr = getStackPort(stackId);
+      int appPort;
+      final configPort = _stackConfigs[stackId]?['port'];
+      if (configPort != null && configPort.toString().isNotEmpty) {
+        appPort = int.tryParse(configPort.toString()) ?? (stackId == 'web_kit' ? 3000 : 8888);
+      } else {
+        appPort = await findAvailableHostPort();
+      }
+      final idePort = await findAvailableHostPort();
+
+      _runtimePorts[stackId] = {
+        'app': appPort,
+        'ide': idePort,
+      };
 
       // 3. Initiate Docker Compose composition
       await _containerService.startStack(corePath, environment: {
-        'PORT': assignedPortStr,
+        'APP_PORT': appPort.toString(),
+        'IDE_PORT': idePort.toString(),
       });
 
       // Create START.md onboarding file

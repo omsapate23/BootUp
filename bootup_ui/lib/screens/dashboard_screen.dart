@@ -737,7 +737,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
                                     Material(
                                       color: Colors.transparent,
                                       child: InkWell(
-                                        onTap: () => launcher.launchSystemBrowser('http://localhost:8443'),
+                                        onTap: () => launcher.launchSystemBrowser('http://localhost:${launcher.getIdePortStr(stackId)}'),
                                         borderRadius: BorderRadius.circular(8),
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

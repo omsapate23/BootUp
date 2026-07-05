@@ -28,12 +28,12 @@ services:
       
     # Expose the local port 3000 mapping it directly to the containerized application port
     ports:
-      - "${PORT:-3000}:${PORT:-3000}"
+      - "${APP_PORT}:3000"
       
     # Setup environment variables for database connection and server state
     environment:
       - NODE_ENV=development
-      - PORT=${PORT:-3000}
+      - PORT=3000
       # Connect to the MongoDB database service using the container service name (database)
       - MONGO_URI=mongodb://database:27017/bootup_dev
       
@@ -75,7 +75,7 @@ services:
     image: codercom/code-server:latest
     container_name: bootup_workspace_editor
     ports:
-      - "127.0.0.1:8443:8443"
+      - "127.0.0.1:${IDE_PORT}:8443"
     volumes:
       - ./project_code/workspace:/home/coder/project
     environment:
