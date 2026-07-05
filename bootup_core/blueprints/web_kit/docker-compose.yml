@@ -75,7 +75,7 @@ services:
     image: codercom/code-server:latest
     container_name: bootup_workspace_editor
     ports:
-      - "${IDE_PORT}:8443"
+      - "127.0.0.1:${IDE_PORT}:8443"
     volumes:
       - ./project_code/workspace:/home/coder/project
     environment:
