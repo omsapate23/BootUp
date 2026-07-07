@@ -173,13 +173,13 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
         ),
       );
     } else if (_selectedNavigationIndex == 1) {
-      final runningStacks = launcher.states.keys.where((id) => launcher.isRunning(id)).toList();
-      if (runningStacks.isNotEmpty) {
-        if (_focusedActiveStackId == null || !runningStacks.contains(_focusedActiveStackId)) {
-          _focusedActiveStackId = runningStacks.first;
+      final runningIds = launcher.states.keys.where((id) => launcher.isRunning(id)).toList();
+      if (runningIds.isNotEmpty) {
+        if (_focusedActiveStackId == null || !runningIds.contains(_focusedActiveStackId)) {
+          _focusedActiveStackId = runningIds.first;
         }
         
-        if (runningStacks.length == 1) {
+        if (runningIds.length == 1) {
           rightContent = _buildActiveWorkspaceCanvas(context, _focusedActiveStackId!);
         } else {
           rightContent = Column(
@@ -190,7 +190,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
                 color: const Color(0xFF1A1A1F),
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 child: Row(
-                  children: runningStacks.map((id) {
+                  children: runningIds.map((id) {
                     final isSelected = id == _focusedActiveStackId;
                     final config = launcher.getStackConfig(id);
                     final displayName = config['name'] ?? (id == 'web_kit' ? 'Web Kit' : 'Python Sandbox');
@@ -523,10 +523,9 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
 
   Widget _buildActiveWorkspaceCanvas(BuildContext context, String stackId) {
     final launcher = Provider.of<LauncherProvider>(context);
-    final appPort = launcher.getAssignedPort(stackId);
-    final idePort = launcher.getIdePort(stackId);
-    final appUrl = 'http://localhost:$appPort';
-    final ideUrl = 'http://localhost:$idePort';
+    final int assignedPort = launcher.getAssignedPort(stackId); // Pulls true runtime OS-probed socket
+    final String applicationUrl = 'http://localhost:$assignedPort';
+    final String codeEditorUrl = 'http://localhost:${launcher.getIdePort(stackId)}'; // Loops to our isolated loopback IDE instance
     
     return Container(
       color: const Color(0xFF1A1A1A),
@@ -578,7 +577,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
                         const Icon(Icons.lock, color: Colors.greenAccent, size: 14),
                         const SizedBox(width: 10),
                         Text(
-                          appUrl,
+                          applicationUrl,
                           style: const TextStyle(
                             color: Colors.white60,
                             fontSize: 13,
@@ -591,7 +590,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
                           color: Colors.transparent,
                           child: InkWell(
                             onTap: () {
-                              launcher.launchSystemBrowser(appUrl);
+                              launcher.launchSystemBrowser(applicationUrl);
                             },
                             borderRadius: BorderRadius.circular(4),
                             child: const Padding(
@@ -782,7 +781,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
                                     Material(
                                       color: Colors.transparent,
                                       child: InkWell(
-                                        onTap: () => launcher.launchSystemBrowser(appUrl),
+                                        onTap: () => launcher.launchSystemBrowser(applicationUrl),
                                         borderRadius: BorderRadius.circular(8),
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -807,7 +806,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WindowListener {
                                     Material(
                                       color: Colors.transparent,
                                       child: InkWell(
-                                        onTap: () => launcher.launchSystemBrowser(ideUrl),
+                                        onTap: () => launcher.launchSystemBrowser(codeEditorUrl),
                                         borderRadius: BorderRadius.circular(8),
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

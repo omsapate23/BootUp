@@ -111,32 +111,21 @@ $stderr
 
   /// Spins up a docker-compose environment in the targeted folder.
   /// Intercepts and parses stderr for port conflict errors (e.g. ports 3000 or 27017).
-  Future<void> startStack(String stackPath, {Map<String, String>? environment}) async {
-    final absoluteStackPath = p.absolute(p.normalize(stackPath));
+  Future<void> startStack(String corePath, {Map<String, String>? environment}) async {
+    final absoluteStackPath = p.absolute(p.normalize(corePath));
     _logEvent('Starting Docker stack composition: $absoluteStackPath');
 
     try {
-      final process = await Process.start(
+      final process = await Process.run(
         'docker',
         ['compose', 'up', '-d', '--force-recreate'],
         workingDirectory: absoluteStackPath,
         environment: environment,
       );
 
-      final stderrBuffer = StringBuffer();
-      final stdoutBuffer = StringBuffer();
-
-      process.stderr.transform(utf8.decoder).listen((data) {
-        stderrBuffer.write(data);
-      });
-
-      process.stdout.transform(utf8.decoder).listen((data) {
-        stdoutBuffer.write(data);
-      });
-
-      final exitCode = await process.exitCode;
-      final stdoutMsg = stdoutBuffer.toString();
-      final stderrMsg = stderrBuffer.toString();
+      final exitCode = process.exitCode;
+      final stdoutMsg = process.stdout.toString();
+      final stderrMsg = process.stderr.toString();
 
       if (exitCode != 0) {
         _logEvent('Stack startup failed for: $absoluteStackPath', details: stderrMsg);

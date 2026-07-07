@@ -5,7 +5,7 @@ services:
     image: jupyter/datascience-notebook:latest
     container_name: bootup_python_notebook
     ports:
-      - "127.0.0.1:${APP_PORT}:8888"
+      - "127.0.0.1:${APP_PORT}:8888" # Hardens our unauthenticated socket strictly to local host loopback
     volumes:
       - ./notebooks/workspace:/home/jovyan/work
     environment:
